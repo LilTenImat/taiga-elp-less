@@ -1,0 +1,29 @@
+<div class="tui-container tui-container_adaptive container">
+    <div class="tui-row ">
+        <h1 class="tui-text_h3">Create new course</h1>
+    </div>
+    <div class="tui-row">
+        <p class="tui-text_body-l">Create your own course, start with entering the title</p>
+    </div>
+    <div class="tui-row tui-row_adaptive tui-row_align_center ">
+        <form [formGroup]="form" (ngSubmit)="onSubmit()">
+            <tui-input 
+            formControlName="title"
+            tuiHintContent="5 to 128 signs"
+            [tuiTextfieldCustomContent]="form.valid ? success : ''"
+            >
+              Title
+              <input tuiTextfield size="l" />
+            </tui-input>
+            <br>
+            <button tuiButton size="m" type="submit" [disabled]="form.invalid">Submit</button>
+        </form>
+    </div>
+
+    <ng-template #success>
+        <tui-svg
+            src="tuiIconCheckLarge"
+            class="success tui-space_left-3"
+        ></tui-svg>
+    </ng-template>
+</div>

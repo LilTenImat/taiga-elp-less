@@ -1,0 +1,82 @@
+<div *ngIf="course$ | async as course">
+
+    <div class="edit">
+        <button 
+        *tuiLet="(savingState$ | async) as saving"
+        style="top: 64px;"
+        tuiButton
+        tuiHint="{{courseForm.pristine ? 'Go back' : 'Save changes'}}"
+        type="button"
+        size="s"
+        [showLoader]="!!saving"
+        appearance="{{courseForm.pristine ? 'secondary' : 'primary'}}"
+        [disabled]="courseForm.pristine && courseForm.invalid || !!saving"
+        (click)="courseForm.pristine ? goBack() : onSaveChanges()">
+            <app-icon>{{ courseForm.pristine ? 'undo' : 'save' }}</app-icon>
+        </button>
+    </div>
+
+    <div class="tui-container tui-container_fullwidth intro">
+        <div class="bgContainer" *tuiLet="(courseForm.controls.image.value) as image">
+            <div class="introBg" *ngIf="image; else bgPlaceholder" [ngStyle]="image ? {'filter': 'blur(4px)', 'background-image': 'url(' + image + ')'} : {}"></div>
+        </div>
+        <div class="bg-text">
+            <div class="tui-container tui-container_adaptive">
+                <div class="tui-row tui-row_adaptive" style="height: 100%;">
+                    <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8">                
+                        <h1 class="title">
+                            <tui-input tuiTextfieldSize="l" [formControl]="courseForm.controls.title">
+                                Title
+                                <input tuiTextfield />
+                            </tui-input>
+                        </h1>
+                        <div class="heroinfo">
+                            <tui-text-area [formControl]="courseForm.controls.intro" [expandable]="false">
+                               Intro
+                            </tui-text-area>
+                        </div>
+                    </div>
+                    <div class="tui-col_md-5 tui-col_lg-4 tui-col_xs-12 card-container">
+                        <course-card [course]="course" mode='editing' (values)="onValuesFromCard($event)" [lang]="language$.value" [editor]="true"></course-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tui-container tui-container_adaptive">
+        <div class="tui-row tui-row_adaptive">
+            <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8" style="z-index: 2;">
+                <h2>About the course</h2>
+                <div >
+                    <tui-editor
+                    class="editor"
+                    [formControl]="courseForm.controls.description"
+                    [tools]="tools"
+                    >
+                        Course description
+                    </tui-editor>
+                </div>
+                <br>
+                <h2>Course modules</h2>
+                <course-modules [modules]="getModules()" [content]="getContent()" [editing]="false" [disabled]="true"></course-modules>
+                <br>
+                <div>
+                    <tui-editor
+                    class="editor"
+                    [formControl]="courseForm.controls.additional"
+                    [tools]="tools"
+                    >
+                        Any additional info
+                    </tui-editor>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <ng-template #bgPlaceholder>
+        <div class="introBg">
+    
+        </div>
+    </ng-template>
+</div>

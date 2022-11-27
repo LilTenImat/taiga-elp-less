@@ -1,0 +1,55 @@
+{
+	"COMMON": {
+		"HEADER": "EASST"
+	},
+	"LANGUAGES": {
+		"EN": "Английский",
+		"RU": "Русский",
+		"HY": "Армянский",
+		"KA": "Грузинский",
+		"KK": "Казахский",
+		"LANGUAGE": "Язык"
+	},
+	"HEADER" : {
+		"about-us": "О нас",
+		"courses" : "Курсы",
+		"classroom" : "Обучение",
+		"library" : "Библитека",
+		"contacts": "Контакты",
+		"blog": "Блог",
+		"login": "Войти",
+		"signup": "Регистрация",
+		"my-courses": "Мои курсы",
+		"logout": "Выход"
+	},
+	"COURSE-LIST" : {
+		"library" : "Курсы"
+	},
+	"BUTTONS" : {
+		"more" : "Подробнее",
+		"delete-course" : "Удалить этот курс",
+		"create-course" : "Создать курс",
+		"login" : "Войти",
+		"signup" : "Регистрация",
+		"join" : "Записаться",
+		"next" : "Далее",
+		"prev" : "Назад",
+		"expand-all" : "Развернуть",
+		"collapse-all" : "Свернуть",
+		"view-all" : "Все курсы",
+		"post" : "Опубликовать",
+		"published": "Опубликлвано",
+		"unpublish": "Скрыть",
+		"result" : "Результат",
+		"add-post": "Новый пост",
+		"save": "Сохранить",
+		"cancel": "Отменить",
+		"edit": "Редактировать",
+		"continue": "Продолжить",
+		"buy-course": "Купить курс",
+		"submit": "Подтвердить",
+		"back-to-results": "Назад к результатам",
+		"retake-the-test": "Перепройти тест",
+		"start-quiz": "Начать"
+	}
+}

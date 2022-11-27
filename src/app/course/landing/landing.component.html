@@ -1,0 +1,101 @@
+<ng-container *ngIf="(getInfo() | async) as info">
+    <div class="intro">
+        <div class="bgContainer">
+            <div class="introBg" *ngIf="info.image; else bgPlaceholder" [ngStyle]="info.image ? {'filter': 'blur(4px)', 'background-image': info.image} : {}"></div>
+        </div>
+        <div class="bg-text">
+            <div class="tui-container tui-container_adaptive">
+                <div class="tui-row tui-row_adaptive" style="height: 100%;">
+                    <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8">                
+                        <h1 class="title">
+                            <tui-line-clamp 
+                            content="{{info.title}}"
+                            [lineHeight]="32"
+                            [linesLimit]="2"
+                            ></tui-line-clamp>
+                        </h1>
+                        <br>
+                        <div class="heroinfo">
+                            <tui-line-clamp 
+                                [content]="intro"
+                                [lineHeight]="24"
+                                [linesLimit]="5"
+                            ></tui-line-clamp>
+                            <ng-template #intro>
+                                <div *ngIf="info.languages" [innerHtml]="info.intro | safe : 'html'" style=" text-overflow: ellipsis;"></div>
+                            </ng-template>
+                        </div>
+                    </div>
+                    <div class="tui-col_xs-12 tui-col_md-5 tui-col_lg-4 card-container">
+                        <course-card *ngIf="course$ | async as course" [course]="course" mode='onpage' [mode]="'onpage'"></course-card>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="tui-container tui-container_adaptive">
+        <div class="tui-row tui-row_adaptive">
+            <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8" style="z-index: 2;">
+                <h2>About the course</h2>
+                <div *ngIf="info.description">
+                    <div [innerHtml]="info.description | safe : 'html'"></div>
+                </div>
+                <br>
+                <h2>Course modules</h2>
+                <course-modules [courseUrl]="info.url" [modules]="getModules()" [content]="getContent()" [mode]="info.mode" [lang]="(language | async) || en"></course-modules>
+                <br>
+                <div *ngIf="info.additional">
+                    <div [innerHtml]="info.additional | safe : 'html'"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- <div *ngIf="course" class='layout'>
+        <app-comments [id]="info.courseId" [origin]="true"></app-comments>
+    </div> -->
+    
+    <!-- <app-popup [duration]="-1" #paypalPopup [width]="'500px'" [height]="'auto'" [hide]="true" class="paypalPopup">
+        <div class="popupContent" *ngIf="course  && paypalPopup.opened">
+            <h2>{{info.title}}
+                <span style="float: right;">{{info.price}}$</span>
+            </h2>
+            <div>
+                <ng-container *ngIf="paymentMode == 'paypal'">
+                    <app-paypal 
+                    
+                        #paypal
+                        (onApprove)=" paypalPopup.onClose(); onSuccess($event); paymentSuccessful.open()"
+                        (onCancel)="paypalPopup.onClose()"
+                        [courseId]="info.courseId" [price]="info.price" 
+                        >
+        
+                    </app-paypal>
+                </ng-container>
+                <ng-container *ngIf="paymentMode == 'stripe'"> 
+                    <app-stripe 
+                    [courseId]="info.courseId" 
+                    [title]="info.languages ? info.languages[language]?.title : ''" 
+                    [price]="info.price"
+                    (onSucceed)="paymentSuccessful.open(); paypalPopup.onClose();">
+                    </app-stripe>
+                </ng-container>
+            </div>
+        </div>
+    </app-popup> -->
+    
+    <!-- <app-popup [duration]="-1" #paymentSuccessful [width]="'400px'" [height]="'auto'" [hide]="true" class="paypalPopup">
+        <div style="max-height: 750px; align-items: center; overflow-y: scroll; padding: 0 5px;">
+            <h2>The payment for the "{{course?.title}}" course was successful.</h2>
+            <a mat-flat-button color="accent" routerLink="content/introduction">Start the course</a>
+        </div>
+    </app-popup> -->
+    
+    
+    <ng-template #bgPlaceholder>
+        <div class="introBg">
+    
+        </div>
+    </ng-template>
+</ng-container>

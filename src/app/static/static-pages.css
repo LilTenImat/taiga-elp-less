@@ -1,0 +1,110 @@
+.content h2{
+    color: #FFFFFF;
+    background: #77C8D4;
+    padding: 5px 10px;
+    max-width: 50%;
+    min-width: 300px;
+    margin-bottom: 15px;
+}
+
+.content a:not([color='accent']){
+    color: #00ACEA;
+}
+.content .paragraph{
+    max-width: 1024px;
+}
+.content iframe {
+    float: right;
+    margin: 0px 10px;
+}
+.content p{
+    font-size: 1.4em;
+    line-height: 1.4em;
+    font-weight: 300;
+    margin-bottom: 25px;
+}
+.content ul, .content ol {
+    margin-bottom: 30px;
+}
+.content li{
+    font-size: 1.4em;
+    line-height: 1.4em;
+    font-weight: 300;
+    margin-bottom: 5px;
+}
+.management{
+    background-color: #d2edf1;
+    color: white;
+    width: 100%;
+    padding: 30px 0 30px 0;
+
+}
+.management h2 {
+    font-family: Kanit;
+    font-style: normal;
+    font-weight: normal;
+    font-size: 30px;
+    line-height: 45px;
+
+    color: #000000;
+}
+.management .mat-card-title{
+    margin-top: 30px;
+    color: black;
+}
+.management .mat-card-title-group{
+    flex-direction: row-reverse;
+}
+.management .partners{
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+    /* gap: 4em; */
+}
+.management .partner{
+    flex: 0 0 30%;
+    min-width: 300px;
+    /* margin: 0 10px 30px 10px; */
+}
+.management .partner img{
+    float: left;
+    margin: 10px;
+}
+
+.wrapper{
+    margin-top: 5%;
+    display: flex;
+    gap: 20px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+.rectangleContainer{
+    flex: 0 0 300px;
+    display: flex;
+    justify-content: center;
+    filter: drop-shadow(0px 32px 13px rgba(0, 0, 0, 0.01)) drop-shadow(0px 18px 11px rgba(0, 0, 0, 0.05)) drop-shadow(0px 8px 8px rgba(0, 0, 0, 0.09)) drop-shadow(0px 2px 4px rgba(0, 0, 0, 0.1)) drop-shadow(0px 0px 0px rgba(0, 0, 0, 0.1));
+}
+
+.rectangle{
+    width: 105px;
+    height: 105px;
+    background: #1DA4B8;
+    border-radius: 27px;
+    transform: rotate(15.67deg);
+}
+
+.icon{
+    color:white;
+}
+.icon *{
+    font-size: 9em;
+    position: relative;
+    transform: rotate(-15.67deg);
+    top: -15px;
+    left: -25px;
+}
+
+.text{
+    flex: 1 0 300px;
+}

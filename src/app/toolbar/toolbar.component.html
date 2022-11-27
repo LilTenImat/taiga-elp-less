@@ -1,0 +1,108 @@
+
+<header class="toolbar">
+    <tui-hosted-dropdown
+        class="hideOnDesktop"
+        #dropdown
+        [content]="menuContent"
+        [(open)]="menuOpen"
+    >
+        <button
+            tuiIconButton
+            appearance="flat"
+            [size]="'s'"
+            type="button"
+            class="button"
+            [pseudoHover]="dropdown.open || null"
+        ><app-icon>menu</app-icon></button>
+    </tui-hosted-dropdown>
+
+    <a class="tui-text_h5 logo" routerLink="/">ELPMaster</a>
+
+    <a tuiButton 
+        [ngClass]="{'active': urlContains(b.url)}"
+        *ngFor="let b of menuButtons"  
+        class="button hideOnMobile" 
+        size="s" appearance="flat" 
+        [routerLink]="b.url"
+    >{{b.url}}</a>
+
+    <span class="spacer"></span>
+
+    <label style="display: flex; align-items: center;" [tuiHint]="nightTheme.value ? 'Disable dark mode' : 'Enable dark mode'">
+        <app-icon>{{nightTheme.value ? 'nightlight_round' : 'light_mode'}}</app-icon>
+        <tui-toggle
+            size="m"
+            class="tui-space_right-1"
+            [showIcons]="true"
+            [formControl]="nightTheme"
+        ></tui-toggle>
+    </label>
+
+    <a tuiButton *ngIf="getAdmin() | async" class="button" size="s" appearance="primary" routerLink="/admin">Admin panel</a>
+    <a tuiButton *ngIf="getEditor() | async" class="button" size="s" appearance="primary" routerLink="/course/new">Create course</a>
+
+    <span class="user tui-text_h6 hideOnMobile user" *ngIf="(user$ | async) as user; else login">
+        {{user.name + ' ' + user.surname}}
+    </span>
+
+    <ng-template #login>
+        <a tuiButton class="button" size="s" appearance="outline" routerLink="/login">Login</a>
+    </ng-template>
+
+</header>
+
+<ng-template #menuContent let-activeZone>
+    <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
+        <ng-container *ngFor="let item of menuButtons">
+            <a tuiOption *ngIf="item.url != 'courses'; else courses" [size]="'s'" routerLink="/{{item.url}}">
+                <app-icon>{{ item.icon }}</app-icon>
+                {{ item.url }}
+            </a>
+            <ng-template #courses>
+                <a tuiOption tuiDropdownSided tuiDropdownAlign="right"
+                    [size]="'s'" [tuiDropdownManual]="false" [tuiDropdown]="courseNest" 
+                    routerLink="/{{item.url}}"
+                >
+                    <app-icon>{{ item.icon }}</app-icon>
+                    {{ item.url }}
+                </a>
+            </ng-template>
+        </ng-container>
+
+        <a *ngIf="user$ | async as user; else login;" 
+            tuiOption tuiDropdownSided tuiDropdownAlign="right" 
+            [size]="'s'" [tuiDropdownManual]="false" [tuiDropdown]="profileNest"
+            routerLink="/profile" style="font-weight: bold;"
+        >
+            <app-icon>account_circle</app-icon>
+            {{user.name + ' ' + user.surname}}
+        </a>
+
+        <ng-template #login>
+            <a tuiOption [size]="'s'" routerLink="/login">
+                <app-icon>login</app-icon>
+                {{ 'login' }}
+            </a>
+        </ng-template>
+
+    </tui-data-list>
+
+    <ng-template #courseNest>
+        <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
+            <a tuiOption [size]="'s'" routerLink="/courses/my">
+                <app-icon>auto_stories</app-icon>
+                {{ 'my courses' }}
+            </a>
+        </tui-data-list>
+    </ng-template>
+
+    <ng-template #profileNest>
+        <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
+            <a tuiOption [size]="'s'" routerLink="/logout">
+                <app-icon>logout</app-icon>
+                {{ 'logout' }}
+            </a>
+        </tui-data-list>
+    </ng-template>
+
+</ng-template>

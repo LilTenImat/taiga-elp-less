@@ -1,1 +1,83 @@
-/* You can add global styles to this file, and also import other style files */
+@import '~@taiga-ui/core/styles/taiga-ui-local';
+
+*{
+    font-family: "Kanit", "Raleway", Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+}
+body{
+    padding: 0;
+    margin: 0;
+    background: var(--tui-base-01);
+}
+
+// input:-webkit-autofill,
+// input:-webkit-autofill:hover,
+// input:-webkit-autofill:focus,
+// input:-webkit-autofill:active {
+//     transition: background-color 5000s ease-in-out 0s;
+// }
+
+.material-symbols-outlined{
+    padding: 10px;
+}
+
+.hideOnDesktop{
+    display: none !important;
+
+    @media @tui-tablet{
+        display: initial !important;
+    }
+}
+.hideOnMobile{
+    @media @tui-mobile{
+        display: none !important;
+    }
+}
+.socket{
+    white-space: pre-wrap;
+}
+
+.edit{
+    position: absolute;
+    left: 0;
+    top: 192px;
+    /* height: 50px; */
+    width: 1px;
+    justify-content: end;
+    /* overflow: hidden; */
+    button{
+        z-index: 5;
+        width: 100px;
+        text-align: right;
+        border-radius: 0 4px 4px 0;
+        color: white;
+        margin: 0;
+        transition: transform 330ms ease-in-out;
+        transform: translate(-55%, 0);
+        app-icon{
+            width: 100%;
+            padding-left: 60%;
+        }
+
+        tui-loader{
+            width: 100%;
+            padding-left: 60%;
+        }
+    }
+    button:hover {
+        transition: transform 330ms ease-in-out;
+        transform: translate(0, 0);
+    }
+
+    @media @tui-mobile{
+        top: 64px;
+    }
+}
+
+.spacer{
+    flex: 1 1 auto;
+}
+
+.layout{
+    min-height: calc(100vh - 4rem);
+}

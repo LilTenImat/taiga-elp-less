@@ -1,0 +1,56 @@
+{
+	"COMMON": {
+		"HEADER": "EASST"
+	},
+	"LANGUAGES": {
+		"EN": "English",
+		"RU": "Russian",
+		"HY": "Armenian",
+		"KA": "Georgian",
+		"KK": "Kazakh",
+		"LANGUAGE": "Language"
+	},
+	"HEADER" : {
+		"about-us": "About Us",
+		"courses" : "Courses",
+		"classroom" : "Classroom",
+		"library" : "Library",
+		"contacts": "Contacts",
+		"blog": "Blog",
+		"login": "Login",
+		"signup": "Sign up",
+		"my-courses": "My courses",
+		"logout": "Logout"
+	},
+	"COURSE-LIST" : {
+		"library" : "Course library",
+		"more" : "More"
+	},
+	"BUTTONS" : {
+		"more" : "Find out more",
+		"delete-course" : "Delete this course",
+		"create-course" : "Create course",
+		"login" : "Login",
+		"signup" : "Sign up",
+		"join" : "Join",
+		"next" : "Next",
+		"prev" : "Previous",
+		"expand-all" : "Expand all sections",
+		"collapse-all" : "Collapse all sections",
+		"view-all" : "View all",
+		"post" : "Publish",
+		"published": "Published",
+		"unpublish": "Unpublish",
+		"result" : "Get result",
+		"add-post": "Create new post",
+		"save": "Save",
+		"cancel": "Cancel",
+		"edit": "Edit",
+		"continue": "Continue",
+		"buy-course": "Buy course",
+		"submit": "Submit",
+		"back-to-results": "Back to results",
+		"retake-the-test": "Retake the test",
+		"start-quiz": "Start"
+	}
+}

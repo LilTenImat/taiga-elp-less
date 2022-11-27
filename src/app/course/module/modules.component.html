@@ -1,0 +1,217 @@
+<ng-container *ngIf="sortedModules$ | async as mds">
+    <!-- Intro -->
+    <div *ngIf="mds[0] as introduction" class="intro">
+        <div *ngIf="introduction.blocks | async as blocks">
+            <ng-container *ngTemplateOutlet="blockList; context: {blocks: blocks, url: introduction.module.url, moduleId: introduction.module.moduleId}"></ng-container>
+        </div>
+    </div>
+
+    <!-- Modules -->
+    <ng-container *tuiLet="(editingModuleId$ | async) as mEditingId">
+        <tui-accordion 
+            *tuiLet="mds.slice(1) as modules;" 
+            class="container" 
+            [rounded]="true" 
+            [closeOthers]="!editing"
+            cdkDropList
+            [cdkDropListData]="modules"
+            (cdkDropListDropped)="dropModule($event)"
+        >
+            <!-- Module header -->
+            <tui-accordion-item 
+                *ngFor="let module of modules; index as i;" 
+                [disabled]="disabled || mEditingId == module.module.moduleId" 
+                cdkDrag
+                [open]="mEditingId == module.module.moduleId"
+                [cdkDragDisabled]="disabled || !editing || (mEditingId == module.module.moduleId)"
+                (openChange)="$event ? onModuleOpen(module.module.moduleId) : onModuleClose(module.module.moduleId)"
+                [showArrow]="false"
+                class="moduleTitle"
+                > 
+                <!-- id="{{module.module.moduleId}}-module" -->
+                <ng-container *ngIf="(mEditingId != module.module.moduleId) || (editingBlockId$ | async); else moduleTitleEdit">
+                    <tui-line-clamp 
+                        [content]="module.module.languages ? module.module.languages[lang].title : module.module.title"
+                        [lineHeight]="24"
+                        [linesLimit]="1"
+                    ></tui-line-clamp>
+                    <span class="spacer"></span>
+                    <tui-badge
+                        *ngIf="editing"
+                        size="m"
+                        status="primary"
+                        class="tui-space_right-2"
+                        [hoverable]="true"
+                        [tuiHint]="'Edit module'"
+                        (click)="onEditModule(module.module.moduleId, module.module.languages ? module.module.languages[lang].title : module.module.title)"
+                        class="editModuleBadge shift"
+                    ><tui-svg src="tuiIconEdit"></tui-svg></tui-badge>
+
+                    <tui-badge
+                        *ngIf="editing"
+                        size="m"
+                        status="error"
+                        class="tui-space_right-2"
+                        [hoverable]="true"
+                        [tuiHint]="'Edit module'"
+                        (click)="onDeleteModule(module.module)"
+                        class="editModuleBadge"
+                    ><tui-svg src="tuiIconTrash"></tui-svg></tui-badge>
+                </ng-container>
+    
+                <ng-template #moduleTitleEdit>
+                    <tui-input
+                        *ngIf="true"
+                        tuiAutoFocus
+                        tuiTextfieldSize="s"
+                        [formControl]="moduleTitleForm"
+                        [tuiDropdownLimitWidth]="'fixed'"
+                        class="moduleInput"
+                    >
+                        Module title here
+                        <input
+                            tuiTextfield
+                            placeholder="Module title here"
+                            />
+                            <!-- (click)="$event.stopPropagation();" -->
+                    </tui-input>
+                    <span class="spacer"></span>
+                    <tui-badge
+                        size="m"
+                        status="success"
+                        class="tui-space_right-2"
+                        [hoverable]="true"
+                        [tuiHint]="'Save module'"
+                        (click)="onSaveModule(module.module)"
+                        class="editModuleBadge shift"
+                        [ngClass]="{'visible' : mEditingId == module.module.moduleId}"
+                    ><tui-svg src="tuiIconCheck"></tui-svg></tui-badge>
+    
+                    <tui-badge
+                        size="m"
+                        status="neutral"
+                        class="tui-space_right-2"
+                        [hoverable]="true"
+                        [tuiHint]="'Undo changes'"
+                        (click)="onCancelModule()"
+                        class="editModuleBadge"
+                        [ngClass]="{'visible' : mEditingId == module.module.moduleId}"
+                    ><tui-svg src="tuiIconUndo"></tui-svg></tui-badge>
+                </ng-template>
+    
+                <ng-template tuiAccordionItemContent *ngIf="getSortedModuleContent(module.module.moduleId) | async as blocks">
+                    <ng-container *ngTemplateOutlet="blockList; context: {blocks: (module.blocks | async), url: module.module.url, moduleId: module.module.moduleId}"></ng-container>
+                </ng-template>
+            </tui-accordion-item>
+        </tui-accordion>
+    </ng-container>
+
+    <!-- Block list template -->
+    <ng-template #blockList let-blocks="blocks" let-url="url" let-moduleId="moduleId">
+        <div         
+            cdkDropList
+            [id]="moduleId"
+            [cdkDropListData]="blocks"
+            (cdkDropListDropped)="dropBlock($event, moduleId)"
+            [cdkDropListConnectedTo]="(openedIds | async) || []"
+            *tuiLet="(editingBlockId$ | async) as bEditingId"
+        >
+            <tui-line-clamp *ngIf="editing && !blocks?.length" 
+                content="This module is empty. You can drag some contents here..."
+                [lineHeight]="24"
+                [linesLimit]="1"
+            ></tui-line-clamp>
+            
+            <!-- Нужен, чтобы нормально перемащать блоки -->
+            <div style="height: 15px;" *ngIf="editing"></div>
+            <div 
+                *ngFor="let block of  blocks; index as j;"    
+                class="content" 
+                cdkDrag
+                [cdkDragDisabled]="!editing || disabled || block.loading"
+                id="{{block.objectId}}"
+                [ngClass]="{'editingBlock' : bEditingId == block.objectId}"
+                > 
+                <div class="blockDragPlaceholder" *cdkDragPlaceholder></div>
+
+                <div class="blockWrapper">
+                    <tui-loader [size]="'m'" [overlay]="true" [showLoader]="block.loading || false" [tuiHint]="block.loading ? blockUploading : null" tuiHintDirection="right">
+                        <app-icon>{{block.type | cIcon}}</app-icon>
+                    </tui-loader>
+                    <tui-line-clamp 
+                        [content]="blockTitle"
+                        [lineHeight]="24"
+                        [linesLimit]="1"
+                        
+                    >
+                        <ng-template #blockTitle>
+                            <a *ngIf="!editing && !disabled; else disabledTitle" class="blockTitle" routerLink="/course/{{lang}}/{{courseUrl ? courseUrl : block.courseId}}/content/{{url}}" [queryParams]="{content: block.order}">{{(block.content.languages ? block.content.languages[lang].title : block.title) || 'New ' + block.type}}</a>
+                        </ng-template>
+                    </tui-line-clamp>
+    
+                    <app-icon *ngIf="editing && !notEmptyBlock(block.content.languages[lang], block.type)" style="color: var(--tui-text-03);">visibility_off</app-icon>
+                    <div class="spacer"></div>
+    
+                    <div class="editButtons" 
+                        *ngIf="editing && !(disabled || block.loading)" 
+                        [ngClass]="{'visible' : bEditingId == block.objectId}">
+                    
+                        <ng-container *ngIf="bEditingId != block.objectId; else editingButtons">
+                            <tui-badge
+                                size="m"
+                                status="primary"
+                                class="tui-space_right-2"
+                                [hoverable]="true"
+                                [tuiHint]="'Edit block'"
+                                (click)="editingBlockId.next(block.objectId)"
+                            ><tui-svg src="tuiIconEdit"></tui-svg></tui-badge>
+                            <tui-badge
+                                size="m"
+                                status="error"
+                                class="tui-space_right-2"
+                                [hoverable]="true"
+                                [tuiHint]="'Delete block'"
+                                (click)="onDeleteBlock(block.objectId)"
+                            ><tui-svg src="tuiIconTrash"></tui-svg></tui-badge>
+                        </ng-container>
+    
+                        <ng-template #editingButtons>
+                            <tui-badge
+                                size="m"
+                                status="success"
+                                class="tui-space_right-2"
+                                [hoverable]="true"
+                                [tuiHint]="'Save changes'"
+                                (click)="onSaveBlock(block)"
+                            ><tui-svg src="tuiIconCheck"></tui-svg></tui-badge>
+                            <tui-badge
+                                size="m"
+                                class="tui-space_right-2 editButton"
+                                status="neutral"
+                                [hoverable]="true"
+                                [tuiHint]="'Undo changes'"
+                                (click)="editingBlockId.next('')"
+                            ><tui-svg src="tuiIconUndo"></tui-svg></tui-badge>
+                        </ng-template>
+                    </div>
+                </div>
+
+
+                <ng-template #blockUploading>
+                    This block is syncing now
+                </ng-template>
+
+                <ng-template #disabledTitle><span class="blockTitle">{{(block.content.languages ? block.content.languages[lang].title : block.title) || 'New ' + block.type}}</span></ng-template>
+            
+
+                <tui-expand [expanded]="bEditingId == block.objectId">
+                    <ng-template tuiExpandContent>
+                        <edit-block #editBlock [content]="block" [lang]="lang" [type]="block.type" [final_test]="block.content.final_test"></edit-block>
+                    </ng-template>
+                </tui-expand>
+            </div>
+        </div>
+    </ng-template>
+
+</ng-container>
+

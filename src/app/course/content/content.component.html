@@ -1,0 +1,24 @@
+<ng-container *ngIf="course$ | async as course"></ng-container>
+
+<div class="edit" >
+    <button
+        tuiButton
+        type="button"
+        size="s"
+        (click)="openModules = true"
+        (tuiActiveZoneChange)="openModules = false"
+        >
+        <app-icon>menu</app-icon>
+        <!-- Nest the directive so it is considered the same active zone -->
+        <div *tuiSidebar="openModules; direction: 'left'; autoWidth: true" class="sidebar-container">
+            <h3 class="tui-text_h4" >
+                <a tuiLink routerLink="/course/{{lang}}/{{course.url}}">
+                    {{course.languages ? course.languages[lang].title : course.title}}
+                </a>
+                <span style="float: right;" class="tui-text_h6">({{lang}})</span>
+
+                <course-modules [lang]="lang" [courseUrl]="course.url" [modules]="getModules()" [content]="getContent()" [mode]="course.mode"></course-modules>
+            </h3>
+        </div>
+    </button>
+</div>

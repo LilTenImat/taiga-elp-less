@@ -1,0 +1,31 @@
+<br>
+<div *ngIf="course$ | async as course" class="tui-container tui-container_adaptive">
+    <div class="tools">
+        <tui-hosted-dropdown
+            #dropdown
+            [content]="selectType"
+            [(open)]="selectOpen"
+        >
+            <button
+                tuiButton
+                appearance="primary"
+                [size]="'s'"
+                [pseudoHover]="dropdown.open || null"
+                [showLoader]="!!(loadingBlock | async)"
+            >Add content</button>
+        </tui-hosted-dropdown>
+
+        <ng-template #selectType let-activeZone>
+            <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
+                <button tuiOption *ngFor="let item of contentTypes" (click)="onAddBlock(item); selectOpen = false;">
+                    <app-icon>{{ item | cIcon }}</app-icon>
+                    {{ item | contentType }}
+                </button> 
+            </tui-data-list>
+        </ng-template>
+
+        <button tuiButton appearance="secondary" size="s" (click)="onAddModule()" [showLoader]="!!(loadingBlock | async)">Add module</button>
+    </div>
+
+    <course-modules #modulesComponent [modules]="getModules()" [content]="getContent()" [mode]="course.mode" [lang]="(lang$ | async) || en" [editing]="true" (loading)="loadingBlock.next($event)"></course-modules>
+</div> 

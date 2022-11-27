@@ -1,0 +1,137 @@
+<tui-island class="card" *ngIf="course; else skeleton">
+    <tui-badge
+        class="badge"
+        [ngClass]="{'hideOnMobile': mode != 'inlist'}"
+        status="primary"
+        tuiHintAppearance="onDark"
+        tuiHintDirection="right"
+        [tuiHint]="course.published ? tooltipPublished : tooltipNotPublished"
+        [hoverable]="true"
+        *ngIf="editor"
+        ><app-icon>{{course.published ? 'visibility' : 'visibility_off'}}</app-icon>
+    </tui-badge>
+    <ng-template #tooltipPublished>
+        {{'This course is visible to all users'}}
+    </ng-template>
+    <ng-template #tooltipNotPublished>
+        {{'This course is visible only to editors'}}
+    </ng-template>
+    
+    <div class="imageBackground" [ngClass]="{'hideOnMobile': mode != 'inlist'}"></div>
+    <img class="cardImg" 
+        *tuiLet="(form.controls.image.value || '') as formImage"
+        mat-card-image 
+        [ngClass]="{'hideOnMobile': mode != 'inlist'}"
+        [ngStyle]="{'backdrop-filter': mode == 'editing' ? 'brightness(20%)' : ''}"
+        [src]="(course.image || formImage) ? (( mode == 'editing' ? formImage : course.image) | safe : 'resourceUrl') : '/assets/images/placeholder.png'"
+    >
+    <ng-template *ngIf="mode == 'editing'" [ngTemplateOutlet]="imageForm" ></ng-template>
+    <tui-line-clamp  [ngClass]="{'hideOnMobile': mode != 'inlist'}" 
+        [content]="titleContent"
+        [lineHeight]="25"
+        [linesLimit]="2"
+    ></tui-line-clamp>
+    
+    <ng-template #titleContent>
+        <h3 class="tui-island__title title">
+            {{course.languages ? course.languages[lang].title : course.title}}
+        </h3>
+    </ng-template>
+    <div *ngIf="mode != 'editing'; else cardInfoForm" class="tui-island__paragraph content" >
+        <tui-line-clamp 
+            [content]="carfInfo"
+            [lineHeight]="24"
+            [linesLimit]="3"
+        ></tui-line-clamp>
+        <ng-template #carfInfo>
+            <div *ngIf="course.languages" [innerHTML]="course.languages[lang].cardInfo | safe : 'html'"></div>
+        </ng-template>
+    </div>
+    <div class="tui-island__paragraph approx">
+        <app-icon>schedule</app-icon> 
+        <p *ngIf="mode != 'editing'; else durationForm">Approx. {{course.duration ? course.duration : 0}} hours to complete</p>
+    </div>
+    <div class="tui-island__paragraph languages">
+        <app-icon>translate</app-icon>
+        <p class="langList"> Languages:                             
+            <span *ngFor="let lang of getLangs(course)">
+                {{ lang }}
+            </span>
+        </p>
+    </div>
+
+    <a tuiButton
+        [disabled]="mode == 'editing'"
+        type="button"
+        appearance="flat"
+        size="m"
+        class="tui-island__footer-button button"
+        routerLink="/course/en/{{course.url}}"
+        >
+        <tui-badge
+        *ngIf="course.price && !course.isJoined"
+        size="m"
+        class="tui-space_right-2 price"
+        status="primary"
+        [hoverable]="true"
+        > ${{course.price}} </tui-badge>
+        {{(course.isJoined ? 'Continue'  :'More')}}
+    </a>
+
+    <ng-template #cardInfoForm>
+        <tui-editor
+            [ngClass]="{'hideOnMobile': mode != 'inlist'}"
+            class="editor"
+            [formControl]="form.controls.cardInfo"
+            [tools]="[]"
+            >
+                Course description
+        </tui-editor>
+    </ng-template>
+    
+    <ng-template #durationForm>
+        <p>
+            <tui-input [formControl]="form.controls.duration" tuiTextfieldSize="s" tuiTextfieldCustomContent="<span>hrs</span>">
+            Time 
+            <input tuiTextfield type="number" min=0 placeholder=""/>
+            </tui-input>    
+        </p>
+    </ng-template>
+
+    <ng-template #imageForm>
+        <tui-input-files
+        [ngClass]="{'hideOnMobile': mode != 'inlist'}"
+        class="cardImageFile"
+        accept="image/*"
+        [formControl]="image"
+        [multiple]="false"
+        (reject)="onReject($event)"
+        ></tui-input-files>
+    </ng-template>
+
+</tui-island>
+<ng-template #skeleton>
+    <tui-island class="card skeleton">
+        <div class="imageBackground" [ngClass]="{'hideOnMobile': mode != 'inlist'}"></div>
+        <div class="tui-skeleton tui-skeleton_rounded cardImg" [ngClass]="{'hideOnMobile': mode != 'inlist'}"></div>
+        <h3  class="tui-skeleton tui-skeleton_text tui-island__title title" [ngClass]="{'hideOnMobile': mode != 'inlist'}"></h3>
+        <h3  class="tui-skeleton tui-skeleton_text tui-skeleton_short tui-island__title title" [ngClass]="{'hideOnMobile': mode != 'inlist'}"></h3>
+        <div class="content">
+            <p class="tui-skeleton tui-skeleton_text"></p>
+            <p class="tui-skeleton tui-skeleton_text"></p>
+            <p class="tui-skeleton tui-skeleton_text tui-skeleton_short"></p>
+        </div>
+
+        <p class="tui-skeleton tui-skeleton_text tui-skeleton_rounded approx" ></p>
+        <p class="tui-skeleton tui-skeleton_text tui-skeleton_rounded languages" ></p>
+
+        <a tuiButton
+            [disabled]="mode == 'editing'"
+            type="button"
+            appearance="flat"
+            size="m" class="tui-island__footer-button tui-skeleton_rounded tui-skeleton button">
+        </a>
+
+    </tui-island>
+</ng-template>
+

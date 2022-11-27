@@ -1,0 +1,19 @@
+<form
+    tuiGroup
+    class="group"
+    [collapsed]="true"
+    [adaptive]="true"
+    [rounded]="true"
+    [formGroup]="stateForm"
+>
+    <tui-radio-block
+        *ngFor="let item of values"
+        [size]="size"
+        contentAlign="right"
+        formControlName="testValue"
+        [item]="item.value"
+        [hideRadio]="true"
+    >
+        {{item.name}}
+    </tui-radio-block>
+</form>

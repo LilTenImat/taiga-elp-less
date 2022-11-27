@@ -1,0 +1,366 @@
+<div class="editContainer">
+    <p>
+        Editing: {{content?.objectId}}
+    </p>
+    <form [formGroup]="contentForm" class="editForm" *tuiLet="this.contentForm.controls as controls">
+        <tui-input
+            tuiTextfieldExampleText="Block title here..."
+            formControlName="title"
+        >
+            Title
+        </tui-input>
+
+        <ng-container [ngSwitch]="type">
+            <ng-container *ngSwitchCase="'video'" [ngTemplateOutlet]="editVideo"></ng-container>
+            <ng-container *ngSwitchCase="'quiz'" [ngTemplateOutlet]="editQuiz"></ng-container>
+            <ng-container *ngSwitchCase="'reading_materials'" [ngTemplateOutlet]="editMaterials"></ng-container>
+            <ng-container *ngSwitchDefault [ngTemplateOutlet]="editArticle"></ng-container>
+        </ng-container>
+
+        <!-- ARTICLE -->
+        <ng-template #editArticle>
+            <button-toggle-group 
+                #toggle
+                size="m" 
+                [values]="[{name: 'Use text', value: 'text'}, {name: 'Use link', value: 'link'}]"
+                [state]="!!controls.text ? 'text' : (!!controls.link ? 'link' : null)"
+                >
+            </button-toggle-group>
+
+            <tui-editor
+                *ngIf="toggle.state == 'text'"
+                class="editor"
+                formControlName="text"
+                [tools]="editorTools">
+            </tui-editor>
+
+            <tui-input
+                *ngIf="toggle.state == 'link'"
+                tuiTextfieldExampleText="http://example.com/"
+                formControlName="link"
+                >
+                Link
+            </tui-input>
+        </ng-template>
+
+        <!-- VIDEO -->
+        <ng-template #editVideo>Video</ng-template>
+
+        <!-- READING_MATERIALS -->
+        <ng-template #editMaterials>Materials</ng-template>
+
+        <!-- QUIZ -->
+        <ng-template #editQuiz>Quiz</ng-template>
+    </form>
+</div>
+
+
+
+
+<!-- 
+<mat-card noBr  class="edit-card" *ngIf="block">
+    
+    <div class="buttons">
+        <button mat-icon-button [matMenuTriggerFor]="edit_menu"><mat-icon>menu</mat-icon></button>
+        <mat-menu #edit_menu="matMenu">
+            <button *ngIf="block.type == 'video'" mat-menu-item (click)="addSubtitles(block)"><mat-icon >closed_caption</mat-icon>Add subtitles</button>
+            <button *ngIf="block.type == 'quiz'" mat-menu-item>
+                <mat-slide-toggle  color="primary"  [(ngModel)]="block.content.final_test">Final</mat-slide-toggle>
+            </button> 
+            <button *ngIf="block.type == 'quiz'" mat-menu-item (click)="onExportQuiz(block, language)"><mat-icon >file_download</mat-icon>Export quiz</button>
+            <button mat-menu-item (click)="deleteBlock.emit(block)"><mat-icon>delete</mat-icon>Remove block</button>
+        </mat-menu>
+    </div>
+
+    <mat-form-field class="contentInput" appearance="outline">
+        <mat-label>Title ({{language}})</mat-label>
+        <input matInput autocomplete="off" [(ngModel)]="block.content.languages[language].title" placeholder="Content title here...">
+    </mat-form-field>
+                
+    <div *ngIf="isArticle(block) && block.content">
+        <mat-button-toggle-group appearance="legacy" #groupArticle="matButtonToggleGroup">
+            <mat-button-toggle  color="primary" value="text" aria-label="Use text editor" [checked]="!!block.content.languages[language].text">
+                Use text
+            </mat-button-toggle>
+            <mat-button-toggle value="link" aria-label="Use content link" [checked]="!!block.content.languages[language].link">
+                Use a link
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+        <ng-container *ngIf="groupArticle.value == 'text'">
+            <div class="editorContainer">
+                <angular-editor [(ngModel)]="block.content.languages[language].text" [config]="editorConfig"></angular-editor>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="groupArticle.value == 'link'">
+            <div class="editorContainer">
+                <mat-form-field appearance="outline">
+                    <mat-label>Content link</mat-label>
+                    <input matInput [(ngModel)]="block.content.languages[language].link" placeholder="Insert link here...">
+                </mat-form-field>
+            </div>
+        </ng-container>
+    </div>
+    
+
+    <div *ngIf="isVideo(block) && block.content">
+        <mat-button-toggle-group appearance="legacy" #groupVideo="matButtonToggleGroup">
+            <mat-button-toggle  color="primary" value="file" aria-label="Upload video file" [checked]="!!block.content.languages[language].files.length">
+                Use a video file
+            </mat-button-toggle>
+            <mat-button-toggle value="link" aria-label="Use content link" [checked]="!!block.content.languages[language].link">
+                Use a link
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+        <ng-container *ngIf="groupVideo.value == 'file'">
+            <div class="editorContainer">
+                     <div class="fileUpload" (fileDropped)="uploadVideo($event, block)">
+                    <h3>
+                        <span>
+                            Choose video file
+                        </span>
+                        <span *ngIf="!!videoInput.files?.length || block.content.languages[language].files.length">
+                            or Drag & Drop file here
+                        </span>
+                    </h3>
+                    <p *ngIf="!(videoInput.value) && !(block.content.languages[language].files.length)">or Drag & Drop file here</p>
+                    <div class="filePreview" *ngIf="!!videoInput.files?.length || block.content.languages[language].files.length">
+                        <div class="fileInfo">
+                            <ng-container *ngIf="videoInput.value && videoInput.files">
+                                <p class="filename">
+                                    <span >{{getFileName(videoInput.files)}}</span>
+                                   </p>
+
+                                <mat-progress-bar color="accent" mode="determinate" [value]="progress"></mat-progress-bar>
+                            </ng-container>
+                            <ng-container *ngIf="block.content.languages[language].files.length">
+                                <p class="filename">
+                                    <span style="flex: 1 1 min-content;">{{getFileName(undefined, block.content.languages[language].files[0].url)}}</span>
+                                </p>
+                                
+                            </ng-container>
+                        </div>
+                        <div class='deleteFile'>
+                            <button mat-mini-fab color="primary" (click)="onDeleteFile(block, videoInput.files ? videoInput: undefined)"><mat-icon>close</mat-icon></button>
+                        </div>
+                    </div>
+                    <input #videoInput type="file" class="file" [disabled]="fileLoading" (change)="uploadVideo($event, block)">
+                </div>
+                <p>
+                    <button mat-icon-button 
+                            color="accent" 
+                            matTooltip="Add subtitles" 
+                            (click)="addSubtitles(block)"
+                            [disabled]="fileLoading">
+                        <mat-icon>
+                            closed_caption
+                        </mat-icon>
+                    </button>
+                    <span style="white-space: nowrap; text-overflow: ellipsis;" *ngIf="block.content.languages[language].subtitles; else Empty">
+                        {{ getFileName(undefined, block.content.languages[language].subtitles) }}
+                    </span>
+                    <ng-template #Empty>
+                        <span style="opacity: 0.5;">no subtitles</span>    
+                    </ng-template>
+                </p>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="groupVideo.value == 'link'">
+            <div class="editorContainer">
+                <mat-form-field appearance="outline">
+                    <mat-label>Content link</mat-label>
+                    <input autocomplete="off" matInput [(ngModel)]="block.content.languages[language].link" placeholder="Insert link here...">
+                </mat-form-field>
+            </div>
+        </ng-container>
+    </div>
+
+    <div *ngIf="isQuiz(block) && block.content">
+        <div class="editorContainer">
+            <angular-editor [(ngModel)]="block.content.languages[language].welcome" [config]="editorConfig" placeholder="Place quiz welcome text here..."></angular-editor>
+        </div>
+        <mat-button-toggle-group appearance="legacy" #groupVideo="matButtonToggleGroup">
+            <mat-button-toggle  color="primary" value="file" aria-label="Upload quiz file" [checked]="!!(block.content.languages[language].files ? block.content.languages[language].files : []).length">
+                Use quiz file
+            </mat-button-toggle>
+            <mat-button-toggle value="quiz" aria-label="Use quiz creator" [checked]="!!(block.content.languages[language].questions ? block.content.languages[language].questions : []).length">
+                Create quiz
+            </mat-button-toggle>
+        </mat-button-toggle-group>
+        <ng-container *ngIf="groupVideo.value == 'file'">
+            <div class="editorContainer">
+                <div class="fileUpload" (fileDropped)="postQuiz($event)">
+                    <h3>
+                        <span>
+                            Choose quiz file
+                        </span>
+                        <span *ngIf="!!quizInput.files?.length || block.content.languages[language].questions?.length">
+                            or Drag & Drop file here
+                        </span>
+                    </h3>
+                    <p *ngIf="!(quizInput.value) && !(block.content.languages[language].files?.length)">or Drag & Drop file here</p>
+                    <div class="filePreview" *ngIf="!!quizInput.files?.length">
+                        <div class="fileInfo" *ngIf="quizInput.value">
+                            <ng-container *ngIf="quizInput.files && quizInput.files?.length">
+                                <p class="filename">
+                                    <span >{{getFileName(quizInput.files)}}</span>
+                                </p>
+
+                                <mat-progress-bar color="accent" mode="determinate" [value]="progress"></mat-progress-bar>
+                            </ng-container>
+                        </div>
+                    </div>
+                    <input #quizInput type="file" class="file" [disabled]="fileLoading" (change)="postQuiz($event)">
+                </div>
+            </div>
+        </ng-container>
+        <ng-container *ngIf="groupVideo.value == 'quiz'">
+            <div class="editorContainer">
+                <div class="quiz-editor-container" *ngIf='block.content.languages[language]?.questions?.length'>
+                <div *ngFor="let q of block.content.languages[language]?.questions; index as i" class="question-container">
+                    <p class="question-field">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Question {{i+1}}.</mat-label>
+                            <input autocomplete="off" matInput [(ngModel)]='q.questionText' placeholder="Some question">
+                            <span matSuffix>
+                                <button mat-icon-button (click)="block.content.languages[language].questions.splice(i, 1)" [disabled]='block.content.languages[language].questions.length < 2' color="warn"> 
+                                    <mat-icon>delete</mat-icon>
+                                </button>
+                            </span>
+                        </mat-form-field>
+                    </p>
+                    <div cdkDropList
+                        id="answerList"
+                        (cdkDropListDropped)="dropAnswer($event)"
+                        [cdkDropListData]="q.answers" > 
+                        <div *ngFor="let ans of q.answers; index as j" class="question-field" cdkDrag>
+                            <div class="module-custom-placeholder" *cdkDragPlaceholder></div>
+                            <mat-icon cdkDragHandle >drag_indicator</mat-icon>
+                            <mat-form-field appearance="outline">
+                                <mat-label>Answer{{j + 1}}</mat-label>
+                                <input  autocomplete="off" matInput [(ngModel)]='ans.answerText' placeholder="Some answer">
+                                <span matPrefix>
+                                    <mat-checkbox [(ngModel)]="ans.isCorrect"></mat-checkbox>
+                                </span>
+                                <span matSuffix>
+                                    <button mat-icon-button (click)="q.answers.splice(j, 1)" [disabled]='q.answers.length < 2'> 
+                                        <mat-icon>close</mat-icon>
+                                    </button>
+                                </span>
+                            </mat-form-field>
+                        </div>
+                    </div>
+                    <button mat-flat-button (click)="q.answers.push({ answerText: 'answer', isCorrect: false })" color="warn">
+                        Add answer
+                    </button>
+                </div>
+
+            </div>
+            <button mat-stroked-button (click)="block.content.languages[language].questions.push({questionText: '',answers: []})" style="display: block; margin-left: auto; color: #54AD54; border-color: #54AD54;">
+                Add question <mat-icon>add</mat-icon>
+            </button>
+            </div>
+        </ng-container>
+    </div>
+
+    <div *ngIf="isPpt(block)">
+        <div class="editorContainer">
+            <angular-editor [(ngModel)]="block.content.languages[language].text" [config]="editorConfig"></angular-editor>
+            <p>and</p>
+            <mat-form-field appearance="outline">
+                <mat-label>Google presentation link</mat-label>
+                <input autocomplete="off" matInput [(ngModel)]="block.content.languages[language].link" placeholder="Insert link here...">
+                <span matSuffix>
+                    <button mat-icon-button (click)="block.content.languages[language].link = ''" [disabled]="!block.content.languages[language].link">
+                        <mat-icon>close</mat-icon>
+                    </button>
+                </span>
+            </mat-form-field>
+        </div>
+    </div>
+
+
+    <div *ngIf="isReadingMaterials(block) && block.content">
+        <div class="editorContainer">
+            <angular-editor [config]="editorConfig" [(ngModel)]='block.content.languages[language].text' placeholder="Place materials description here"></angular-editor>
+        </div>
+        <div class="editorContainer">
+            <div class="quiz-editor-container" *ngIf='block.content.languages[language]?.texts?.length'>
+                <div *ngFor="let t of block.content.languages[language]?.texts; let i = index; trackBy:trackByIdx" class="question-container">
+                    <button mat-icon-button
+                        (click)="block.content.languages[language].texts.splice(i, 1);
+                                block.content.languages[language].titles.splice(i, 1);
+                                block.content.languages[language].files.splice(i, 1);
+                            "
+                        style="position: absolute; top: 10px; right: -50px; color: red;"
+                        matTooltip="Delete this material"
+                    >
+                        <mat-icon>delete</mat-icon>
+                    </button>
+                    <mat-button-toggle-group appearance="legacy" #groupRMaterials="matButtonToggleGroup">
+                        <mat-button-toggle  color="primary" value="file" aria-label="Upload some file" [checked]="!!block.content.languages[language].files[i].fileId">
+                            Use a file
+                        </mat-button-toggle>
+                        <mat-button-toggle value="link" aria-label="Use content link" [checked]="!block.content.languages[language].files[i].fileId">
+                            Use a link
+                        </mat-button-toggle>
+                    </mat-button-toggle-group>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Title</mat-label>
+                        <input type="text" matInput [(ngModel)]='block.content.languages[language].titles[i]' placeholder="Enter title of the document">
+                    </mat-form-field>
+                    <mat-form-field appearance="outline">
+                        <mat-label>Description</mat-label>
+                        <textarea type="text" matInput [(ngModel)]='block.content.languages[language].texts[i]' placeholder="Enter description"></textarea>
+                    </mat-form-field>
+                    <br>
+                    <ng-container *ngIf="groupRMaterials.value == 'file'">
+                           <div class="fileUpload" style="width: 100%;" (fileDropped)="uploadMaterial($event, block, i)">
+                                <h3>
+                                    <span>
+                                        Choose file
+                                    </span>
+                                    <span *ngIf="!!fileInput.files?.length || block.content.languages[language].files[i]?.url?.length">
+                                        or Drag & Drop file here
+                                    </span>
+                                </h3>
+                                <p *ngIf="!(fileInput.value) && !(block.content.languages[language].files[i]?.url?.length)">or Drag & Drop file here</p>
+                                <div class="filePreview" *ngIf="!!fileInput.files?.length || block.content.languages[language].files[i]?.url?.length">
+                                    <div class="fileInfo">
+                                        <ng-container *ngIf="fileInput.value && fileInput.files">
+                                            <p class="filename">
+                                                <span >{{getFileName(fileInput.files)}}</span>
+
+                                            </p>
+        
+                                            <mat-progress-bar color="accent" mode="determinate" [value]="progress"></mat-progress-bar>
+                                        </ng-container>
+                                        <ng-container *ngIf="block.content.languages[language].files[i]?.url?.length">
+                                            <p class="filename">
+                                                <span style="flex: 1 1 min-content;">{{getFileName(undefined, block.content.languages[language].files[i].url.length ?  block.content.languages[language].files[i].url : undefined)}}</span>
+                                            </p>
+                                        </ng-container>
+                                    </div>
+                                    <div class='deleteFile'>
+                                        <button mat-mini-fab color="primary" (click)="onDeleteFile(block, fileInput.files ? fileInput: undefined, i)"><mat-icon>close</mat-icon></button>
+                                    </div>
+                                </div>
+                                <input id="fileInput" #fileInput type="file" class="file" [disabled]="fileLoading" (change)="uploadMaterial($event, block, i)">
+                            </div>
+                    </ng-container>
+                    <ng-container *ngIf="groupRMaterials.value == 'link'">
+                        <mat-form-field appearance="outline">
+                            <mat-label>Content link</mat-label>
+                            <input autocomplete="off" matInput [(ngModel)]="block.content.languages[language].files[i].url" placeholder="Insert link here...">
+                        </mat-form-field>
+                    </ng-container>
+                </div>
+
+            </div>
+            <button mat-stroked-button (click)="block.content.languages[language].texts.push(''); block.content.languages[language].titles.push(''); block.content.languages[language].files.push({fileId: '', url: ''})" style="display: block; margin-left: auto; color: #54AD54; border-color: #54AD54;">
+                Add material <mat-icon>add</mat-icon>
+            </button>
+        </div>
+    </div>
+
+
+</mat-card> -->

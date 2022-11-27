@@ -1,0 +1,106 @@
+<ng-container *tuiLet="!!(isDarkTheme$ | async) as darkTheme">
+    <tui-theme-night *ngIf="darkTheme"></tui-theme-night>
+    <tui-root > 
+        <!-- <div class="tui-container">
+            <tui-breadcrumbs>
+                <ng-container *ngFor="let item of route$ | async">
+                    <a
+                        *tuiItem
+                        tuiLink
+                        [routerLink]="item.link"
+                        [queryParams]="item.query ? item.query : {}"
+                    >
+                        {{ item.name }}
+                    </a>
+                </ng-container>
+            </tui-breadcrumbs>
+        </div> -->
+        
+
+        <ng-container *ngIf="(course$ | async) as course; else courseLandingSkeleton">
+            <ng-container [ngSwitch]="(mode$ | async)">
+                <edit-landing *ngSwitchCase="'landing'" [course]="course" (edited)="courseSubject$.next($event)"></edit-landing>
+                <edit-content *ngSwitchCase="'content'" [course]="course" [lang]="(language | async) || en"></edit-content>
+                <app-content *ngSwitchCase="'view'" [course]="course" [lang]="(language | async) || en"></app-content>
+                <course-landing *ngSwitchDefault [course]="course"></course-landing>
+            </ng-container>
+        </ng-container>
+        
+        <div class="edit">
+            <button
+                *ngIf="(course$ | async)"
+                tuiButton
+                type="button"
+                size="s"
+                (click)="toggle(true)"
+                (tuiActiveZoneChange)="toggle($event)"
+                > <app-icon>settings</app-icon>
+                <!-- (click)="toggle(true)" -->
+        
+                <div #sidebar *tuiSidebar="open.value; direction: 'left'; autoWidth: true;"  >
+                    <div *ngIf="(title$url | async) as course" class="sidebar-container">
+                        <h4 class="tui-text_h4" >
+                            <a tuiLink routerLink="/course/{{course.lang}}/{{course.url}}" (click)="toggle(false)">
+                                {{course.title}}
+                            </a>
+                            <span style="float: right;" class="tui-text_h6">({{course.lang}})</span>
+                        </h4>
+                
+                        <a tuiButton appearance="primary" size="m" (click)="toggle(false)" routerLink="/course/{{course.lang}}/{{course.url}}" [queryParams]="{'edit': 'landing'}">Edit landing</a>
+                        <a tuiButton appearance="primary" size="m" (click)="toggle(false)" routerLink="/course/{{course.lang}}/{{course.url}}" [queryParams]="{'edit': 'content'}">Edit content</a>
+                        <a tuiButton appearance="primary" size="m" (click)="toggle(false)" routerLink="/course/{{course.lang}}/{{course.url}}" [queryParams]="{'edit': 'settings'}">Settings</a>
+                
+                    </div>
+                </div>
+            </button>
+        </div>
+        
+    </tui-root>
+</ng-container>
+
+<ng-template #courseLandingSkeleton>
+    <div style="position: relative;">
+        <div class="intro">
+            <div class="bgContainer">
+                <div class="introBg"></div>
+            </div>
+            <div class="bg-text">
+                <div class="tui-container tui-container_adaptive">
+                    <div class="tui-row tui-row_adaptive" style="height: 100%;">
+                        <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8 skeleton" >
+                            <h1 class="title tui-skeleton tui-skeleton_light"></h1>
+                            <br>
+                            <div class="heroinfo">
+                                <p class="tui-skeleton tui-skeleton_light"></p>
+                                <p class="tui-skeleton tui-skeleton_light"></p>
+                                <p class="tui-skeleton tui-skeleton_short tui-skeleton_light"></p>
+                            </div>
+                        </div>
+                        <div class="tui-col_xs-12 tui-col_md-5 tui-col_lg-4 card-container">
+                            <course-card></course-card>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="tui-container tui-container_adaptive">
+            <div class="tui-row tui-row_adaptive">
+                <div class="tui-col_xs-12 tui-col_md-7 tui-col_lg-8 skeleton" style="z-index: 2;">
+                    <!-- About -->
+                    <h2 class="title tui-skeleton tui-skeleton_short"></h2>
+                    <p class="tui-skeleton" *ngFor="let i of [1, 2, 3, 4, 5, 6]"></p>
+                    <p class="tui-skeleton tui-skeleton_short"></p>
+                    <br>
+                    <!-- Course content -->
+                    <h2 class="title tui-skeleton tui-skeleton_short"></h2>
+                    <div class="panel tui-skeleton" *ngFor="let j of [1, 2, 3, 4, 5, 6]"></div>
+                    <br>
+                    <!-- Additional info -->
+                    <h2 class="title tui-skeleton tui-skeleton_short"></h2>
+                    <p class="tui-skeleton" *ngFor="let i of [1, 2, 3, 4, 5, 6]"></p>
+                    <p class="tui-skeleton tui-skeleton_short"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+</ng-template>
