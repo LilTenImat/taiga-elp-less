@@ -1,4 +1,4 @@
-export const serverUrl = 'http://localhost:8080/';
+export const serverUrl = 'http://50.112.224.145/';
 
 export const ENDPOINTS = {
     course:     serverUrl + 'api/courses',

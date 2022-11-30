@@ -5,6 +5,7 @@ import { AuthService } from './auth.service';
 import { ENDPOINTS } from '../config';
 import { Course } from '../course/course';
 import { languages } from '../environment';
+import { IObject } from '../course/content/content';
 
 @Injectable({providedIn: 'root'})
 export class FileService extends ApiService {
@@ -29,7 +30,7 @@ export class FileService extends ApiService {
     postObjectFile = (objectId: string, file: any) => {
         const formData: FormData = new FormData();
         formData.append("file", file, file.name); 
-        return this.makeRawRequest({
+        return this.makeRawRequest<IObject>({
                 endpoint:`${ENDPOINTS.object}/${objectId}/file`,
                 body: formData, 
                 method: 'post',

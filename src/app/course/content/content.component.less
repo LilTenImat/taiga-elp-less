@@ -9,4 +9,68 @@
     &>*{
         margin-bottom: 1em;
     }
+
+    .quiestion{
+        background: var(--tui-base-01);
+        .answers{
+            // padding-left: 2em;
+
+            .answer{
+                margin-bottom: 0.5em;
+            }
+
+            .addAns{
+                // float: right;
+                margin-left: auto;
+            }
+        }
+
+    }
+    .addQue{
+        // float: right;
+        margin-left: auto;
+    }
+}
+
+.quiestionText, .answerText{
+    display: flex;
+    align-items: center;
+    tui-input{
+        flex: 1 0 auto;
+    }
+}
+
+.active{
+    border: 1px solid red !important;
+}
+
+.active-zone{
+    padding: 1em;
+    pointer-events: auto;
+    cursor: auto;
+}
+
+.qPlaceholder, .aPlaceholder{
+    background: var(--tui-base-02);
+    border-radius: var(--tui-radius-m);
+    height: 50px;
+    margin-bottom: 1em;
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px dashed var(--tui-accent-active);
+    overflow: hidden;
+}
+
+.aPlaceholder{
+    height: 25px;
+    margin-bottom: 0.5em;
+}
+
+.active-zone_active{
+    border: 1px solid var(--tui-text-01);
+    border-radius: var(--tui-radius-l);
+}
+.icon {
+    cursor: pointer;
+    pointer-events: auto;
 }

@@ -9,7 +9,7 @@
     </h2>
     <div class="tui-container tui-container_adaptive">
         <div class="tui-row tui-row_adaptive tui-row_align_start" *ngIf="(courses$ | async) as courses; else: skeleton;">
-            <div *ngFor="let course of courses; index as i" class="list-container" >
+            <div *ngFor="let course of courses; index as i" class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container">
                 <course-card [course]="course" mode="inlist" [@tuiFadeIn]="getAnimation(300)" [editor]="editor"></course-card>
             </div>
         </div>
@@ -17,7 +17,7 @@
     
     <ng-template #skeleton>
         <div class="tui-row tui-row_adaptive tui-row_align_start">
-            <div class="list-container" *ngFor="let i of [1, 2, 3]">
+            <div class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container" *ngFor="let i of [1, 2, 3]">
                 <course-card mode="inlist" [@tuiFadeIn]="getAnimation(300)"></course-card>
             </div>
         </div>

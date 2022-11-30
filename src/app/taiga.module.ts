@@ -15,8 +15,13 @@ import {
 	TuiDataListWrapperModule,
     TuiBreadcrumbsModule,
     TuiToggleModule,
-    TuiRadioBlockModule
+    TuiRadioBlockModule,
+    TuiFieldErrorPipeModule,
+    TuiInputPasswordModule,
+    TuiActionModule,
 } from '@taiga-ui/kit';
+
+// import {TuiTilesModule} from '@taiga-ui/kit';
 
 import { 
     TuiHintModule,
@@ -31,7 +36,9 @@ import {
     TuiModeModule,
     TuiLoaderModule,
     TuiGroupModule,
-    TuiExpandModule
+    TuiExpandModule,
+    TuiErrorModule,
+    TuiPrimitiveTextfieldModule
 } from '@taiga-ui/core';
 
 import { 
@@ -82,7 +89,13 @@ import { TuiReorderModule } from '@taiga-ui/addon-table';
         TuiLoaderModule,
         TuiGroupModule,
         TuiRadioBlockModule,
-        TuiExpandModule
+        TuiExpandModule,
+        TuiErrorModule,
+        TuiFieldErrorPipeModule,
+        TuiInputPasswordModule,
+        TuiActionModule,
+        TuiPrimitiveTextfieldModule,
+        TuiTilesModule
     ]
 })
 export class TaigaModule { }

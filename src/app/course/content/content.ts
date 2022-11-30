@@ -49,16 +49,18 @@ export interface Article {
   text: string;
 }
 
+export interface _question{
+  questionText: string;
+  answers: {
+    answerText: string;
+    isCorrect: boolean;
+  }[];
+}
+
 export interface Quiz {
   title: string;
   completed: boolean;
-  questions: {
-    questionText: string;
-    answers: {
-      answerText: string;
-      isCorrect: boolean;
-    }[];
-  }[];
+  questions: _question[]
   final_test?: boolean;
   welcome?: '';
 }

@@ -1,12 +1,13 @@
 import jwt_decode from "jwt-decode";
-import { Injectable } from '@angular/core';
+import { Inject, Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { BehaviorSubject, Observable, of } from 'rxjs';
+import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, concatMap, filter, map, tap } from 'rxjs/operators';
 
 import { ENDPOINTS } from '../config';
 import { User } from '../user/user';
 import { Router } from "@angular/router";
+import { TuiAlertService } from "@taiga-ui/core";
 
 @Injectable({
     providedIn: 'root'
@@ -20,7 +21,7 @@ export class AuthService{
 
   tokenName = 'elpUserToken';
 
-  constructor(
+  constructor(        
     private http: HttpClient,
     private router: Router,
   ) {
@@ -75,7 +76,7 @@ export class AuthService{
       }),
       catchError(val => {
         this.currentUserSubject.next(null);
-        return of(val);
+        return throwError(() => val);
       })
     );
   }

@@ -1,5 +1,5 @@
 import { Component, Input, OnInit } from '@angular/core';
-import { FormGroup } from '@angular/forms';
+import { FormControl, FormGroup } from '@angular/forms';
 
 @Component({
     selector: 'button-toggle-group',
@@ -18,7 +18,7 @@ export class ButtonToggleComponent implements OnInit {
         return this.stateForm.value;
     }
 
-    stateForm = new FormGroup<string | null>(null);
+    stateForm = new FormControl<string | null>(null);
 
     constructor() { }
 

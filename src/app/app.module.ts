@@ -45,6 +45,8 @@ import {
   tuiLegacyEditorConverter,
 } from '@taiga-ui/addon-editor';
 import { ButtonToggleComponent } from "./helpers/button-toggle/button-toggle.component";
+import { LoginComponent } from "./user/auth/login.component";
+import { AuthComponent } from "./user/auth/auth.component";
 
 @NgModule({
   declarations: [
@@ -63,6 +65,8 @@ import { ButtonToggleComponent } from "./helpers/button-toggle/button-toggle.com
     ContentComponent,
     EditContentComponent,
     EditBlockComponent,
+    LoginComponent,
+    AuthComponent,
 
     ButtonToggleComponent,
     
@@ -84,7 +88,8 @@ import { ButtonToggleComponent } from "./helpers/button-toggle/button-toggle.com
     TuiAlertModule,
     TaigaModule,
     DragDropModule,
-    StaticPagesModule
+    StaticPagesModule,
+    
 ],
   providers: [
     {provide: TUI_SANITIZER, useClass: NgDompurifySanitizer},

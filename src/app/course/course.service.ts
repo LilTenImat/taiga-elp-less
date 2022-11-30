@@ -34,7 +34,9 @@ export class CourseService extends ApiService {
 
     refreshCourse(courseId?: string){
       const course = this.currentCourse$.value;
-      if(!courseId && !course) return
+      if(!courseId && !course) return;
+      if(course && course.courseId != courseId) this.currentCourse$.next(null);
+
 
       this.http.get<Course>(`${ENDPOINTS.course}/${courseId || course?.courseId}`, {
         headers: {'Content-Type': 'application/json', Authorization: 'Bearer ' + this.auth.getToken()},

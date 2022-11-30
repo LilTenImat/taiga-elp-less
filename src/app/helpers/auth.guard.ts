@@ -9,9 +9,14 @@ import { map } from 'rxjs/operators';
 export class AuthGuarg implements CanActivate {
     constructor(
         private authService: AuthService,
+        private router: Router
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-      return this.authService.currentUser.pipe(map(user => !!user));  
+      return this.authService.currentUser.pipe(map(user => {
+        if(!user) this.router.navigate(['/login']);
+
+        return !!user;
+      }));  
     }
 }

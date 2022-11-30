@@ -21,7 +21,7 @@
     <a tuiButton 
         [ngClass]="{'active': urlContains(b.url)}"
         *ngFor="let b of menuButtons"  
-        class="button hideOnMobile" 
+        class="button hideOnMobile hideOnTablet" 
         size="s" appearance="flat" 
         [routerLink]="b.url"
     >{{b.url}}</a>
@@ -38,10 +38,10 @@
         ></tui-toggle>
     </label>
 
-    <a tuiButton *ngIf="getAdmin() | async" class="button" size="s" appearance="primary" routerLink="/admin">Admin panel</a>
-    <a tuiButton *ngIf="getEditor() | async" class="button" size="s" appearance="primary" routerLink="/course/new">Create course</a>
+    <a tuiButton *ngIf="getAdmin() | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/admin">Admin panel</a>
+    <a tuiButton *ngIf="getEditor() | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/course/new">Create course</a>
 
-    <span class="user tui-text_h6 hideOnMobile user" *ngIf="(user$ | async) as user; else login">
+    <span class="user tui-text_h6 hideOnMobile hideOnTablet user" *ngIf="(user$ | async) as user; else login">
         {{user.name + ' ' + user.surname}}
     </span>
 

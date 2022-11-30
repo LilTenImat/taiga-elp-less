@@ -12,6 +12,8 @@ import { ClassroomComponent } from './static/classroom.component';
 import { CopyrightComponent } from './static/copyright.component';
 import { CookiePolicyComponent } from './static/cookie-policy.component';
 import { PrivacyPolicyComponent } from './static/privacy-policy.component';
+import { LoginComponent } from './user/auth/login.component';
+import { AuthComponent } from './user/auth/auth.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/courses', pathMatch: 'full' },
@@ -72,7 +74,7 @@ const routes: Routes = [
   // { path: 'profile', component: ProfileComponent },
 
   // // auth
-  // { path: 'login', component: LoginComponent },
+  { path: 'login', component: AuthComponent, data: {mode: 'login'} },
   // { path: 'signup', component: SignupComponent },
   // { path: 'recovery', component: RestoreComponent },
   { path: 'logout', canActivate: [LogoutGuarg], component: CourseListComponent},

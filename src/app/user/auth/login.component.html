@@ -1,0 +1,45 @@
+
+<div
+    [ngClass]="{'tui-container_adaptive center': !embed}"
+>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit($event)">
+        <div class="tui-row tui-row_sme">
+            <div class="tui-col_12 fields">
+                <h3 class="tui-form__header tui-form__header_margin-top_none">Login</h3>
+                <div class="tui-form__row">
+                    <tui-input
+                            tuiTextfieldExampleText="youareawsome@gmail.com"
+                            formControlName="email"
+                        >
+                            Email
+                            <span class="tui-required"></span>
+                    </tui-input>
+                    <tui-error
+                            formControlName="email"
+                            [error]="[] | tuiFieldError | async"
+                    ></tui-error>
+                </div>
+                <div class="tui-form__row">
+                    <tui-input-password formControlName="password">Password</tui-input-password>
+                    <tui-error
+                        formControlName="password"
+                        [error]="[] | tuiFieldError | async"
+                    ></tui-error>
+                </div>
+
+                <div class="tui-form__buttons">
+                    <button
+                        tuiButton
+                        size="m"
+                        type="submit"
+                        class="tui-form__button"
+                        [disabled]="loginForm.invalid"
+                        [showLoader]="showLoader"
+                    >
+                        Submit
+                    </button>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

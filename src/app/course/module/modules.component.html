@@ -20,7 +20,7 @@
             <!-- Module header -->
             <tui-accordion-item 
                 *ngFor="let module of modules; index as i;" 
-                [disabled]="disabled || mEditingId == module.module.moduleId" 
+                [disabled]="disabled || (mEditingId == module.module.moduleId)" 
                 cdkDrag
                 [open]="mEditingId == module.module.moduleId"
                 [cdkDragDisabled]="disabled || !editing || (mEditingId == module.module.moduleId)"
@@ -128,7 +128,7 @@
                 *ngFor="let block of  blocks; index as j;"    
                 class="content" 
                 cdkDrag
-                [cdkDragDisabled]="!editing || disabled || block.loading"
+                [cdkDragDisabled]="!editing || disabled || block.loading || bEditingId == block.objectId"
                 id="{{block.objectId}}"
                 [ngClass]="{'editingBlock' : bEditingId == block.objectId}"
                 > 
@@ -163,7 +163,7 @@
                                 class="tui-space_right-2"
                                 [hoverable]="true"
                                 [tuiHint]="'Edit block'"
-                                (click)="editingBlockId.next(block.objectId)"
+                                (click)="editingBlockId.next(block.objectId); editingModuleId.next(moduleId)"
                             ><tui-svg src="tuiIconEdit"></tui-svg></tui-badge>
                             <tui-badge
                                 size="m"
@@ -190,7 +190,7 @@
                                 status="neutral"
                                 [hoverable]="true"
                                 [tuiHint]="'Undo changes'"
-                                (click)="editingBlockId.next('')"
+                                (click)="editingModuleId.next(''); editingBlockId.next('');"
                             ><tui-svg src="tuiIconUndo"></tui-svg></tui-badge>
                         </ng-template>
                     </div>
