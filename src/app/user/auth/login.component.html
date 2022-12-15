@@ -33,7 +33,7 @@
                         size="m"
                         type="submit"
                         class="tui-form__button"
-                        [disabled]="loginForm.invalid"
+                        [disabled]="loginForm.invalid || showLoader"
                         [showLoader]="showLoader"
                     >
                         Submit

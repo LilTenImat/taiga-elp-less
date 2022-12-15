@@ -5,49 +5,52 @@
 }
 
 .editForm{
-
-    &>*{
+    .titleInput{
         margin-bottom: 1em;
     }
 
     .quiestion{
         background: var(--tui-base-01);
         .answers{
-            // padding-left: 2em;
-
-            .answer{
-                margin-bottom: 0.5em;
-            }
-
             .addAns{
-                // float: right;
-                margin-left: auto;
+                text-align: right;
             }
         }
-
     }
-    .addQue{
-        // float: right;
-        margin-left: auto;
-    }
-}
-
-.quiestionText, .answerText{
-    display: flex;
-    align-items: center;
-    tui-input{
-        flex: 1 0 auto;
+    .questions{
+        .addQue{
+            text-align: right;
+        }
     }
 }
 
-.active{
-    border: 1px solid red !important;
+.quiestionText{
+    margin-bottom: 1em;
+}
+
+.answerText{
+    margin-bottom: 0.5em;
+    tui-checkbox-labeled{
+        width: 100%;
+        ::ng-deep label{
+            width: 100%;
+            align-items: center;
+            &>*:not(tui-checkbox){
+                flex: 1;
+            }
+        }
+    }
 }
 
 .active-zone{
     padding: 1em;
     pointer-events: auto;
     cursor: auto;
+    margin-bottom: 1em;
+}
+.active-zone_active{
+    border: 1px solid var(--tui-text-01);
+    border-radius: var(--tui-radius-l);
 }
 
 .qPlaceholder, .aPlaceholder{
@@ -66,11 +69,84 @@
     margin-bottom: 0.5em;
 }
 
-.active-zone_active{
-    border: 1px solid var(--tui-text-01);
-    border-radius: var(--tui-radius-l);
-}
+
 .icon {
     cursor: pointer;
     pointer-events: auto;
+}
+
+.title{
+    margin: 1em 0 1em 0;
+}
+
+.slash{
+    @media @tui-desktop {
+        display: block;
+        height: 1px;
+        visibility: hidden;
+    }
+}
+
+.content-view.tui-row{
+    justify-content: center;
+}
+
+.content{
+    height: 100%;
+    box-sizing: border-box;
+    min-height: 70vh;
+    border-radius: var(--tui-radius-m);
+    
+    .scrollbar{
+        width: 100%;
+
+        .navWrapper{
+            display: flex;
+            align-items: center;
+            width: 100%;
+            .contentNav{
+                gap: 20px;
+                position: relative;
+                flex: 1;
+                .contentTab{
+                    margin: 0 !important;
+                    text-align: center;
+                    flex: 1 0 20%;
+                    min-width: 200px;
+                    overflow: hidden;
+                    justify-content: center;
+                    ::ng-deep span{   
+                        display: flex;
+                    }
+        
+                    &.active{
+                        border-bottom: var(--tui-primary);
+                    }
+                    &.completed{
+                        border-bottom: var(--tui-sucess-fill);
+                    }
+                }
+            }
+        }
+    }
+
+    .contentPortal{
+        padding: 1em;
+    }
+    
+}
+
+.sidebar-container{
+    width: 60vw;
+    min-width: 300px;
+    @media @tui-mobile {
+        width: 90vw;
+    }
+    padding: 1em;
+}
+
+
+.video{
+    width: 100%;
+    border-radius: var(--tui-radius-m);
 }

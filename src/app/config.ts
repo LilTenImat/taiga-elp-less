@@ -1,4 +1,4 @@
-export const serverUrl = 'http://50.112.224.145/';
+export const serverUrl = 'https://easstacademy.org/';
 
 export const ENDPOINTS = {
     course:     serverUrl + 'api/courses',

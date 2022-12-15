@@ -102,6 +102,8 @@ export interface IObject {
   actions: XapiStatement[];
 
   loading?: boolean;
+  public?: boolean;
+  
 }
 export interface LibraryMaterials{
   title: string;

@@ -1,24 +1,99 @@
-<ng-container *ngIf="course$ | async as course"></ng-container>
 
-<div class="edit" >
-    <button
-        tuiButton
-        type="button"
-        size="s"
-        (click)="openModules = true"
-        (tuiActiveZoneChange)="openModules = false"
-        >
-        <app-icon>menu</app-icon>
-        <!-- Nest the directive so it is considered the same active zone -->
-        <div *tuiSidebar="openModules; direction: 'left'; autoWidth: true" class="sidebar-container">
-            <h3 class="tui-text_h4" >
-                <a tuiLink routerLink="/course/{{lang}}/{{course.url}}">
-                    {{course.languages ? course.languages[lang].title : course.title}}
-                </a>
-                <span style="float: right;" class="tui-text_h6">({{lang}})</span>
-
-                <course-modules [lang]="lang" [courseUrl]="course.url" [modules]="getModules()" [content]="getContent()" [mode]="course.mode"></course-modules>
-            </h3>
+<ng-container *ngIf="content$ | async as content">
+    <div class="tui-container tui-container_fullwidth">
+        <div class="edit hideOnDesktop">
+            <button
+                tuiButton
+                type="button"
+                size="s"
+                (click)="toggleSidebar(true)"
+                (tuiActiveZoneChange)="toggleSidebar($event)"
+            >
+                <app-icon>menu</app-icon>
+                <!-- Nest the directive so it is considered the same active zone -->
+                <div *tuiSidebar="openModules; direction: 'left'; autoWidth: true" class="sidebar-container">
+                    <h3 class="tui-text_h5" >
+                        <a tuiLink routerLink="/course/{{lang}}/{{content.info.url}}">
+                            {{content.info.title}}
+                        </a>
+                        <!-- <span style="float: right;" class="tui-text_h6">({{lang}})</span> -->
+                        <ng-container *ngTemplateOutlet="modulesComponent"></ng-container>
+                    </h3>
+                </div>
+            </button>
         </div>
-    </button>
-</div>
+        <h4 class="tui-text_h4 title">
+            <a tuiLink routerLink="/course/{{lang}}/{{content.info.url}}">{{ content.info.title }}</a>
+            <span class="slash">{{' / '}}</span>
+            <span class="hideOnMobile">{{ content.module.languages ? content.module.languages[lang].title : content.module.title }}</span>
+        </h4>
+    </div>
+
+    <div class="tui-container tui-container_fullwidth">
+        <div class="content-view tui-row tui-row_adaptive">
+            <div class="tui-col_lg-9 tui-col_md-9 tui-col_xs-12 content">
+                <ng-container *ngTemplateOutlet="contentPortal; context: {contents: content.blocks}"></ng-container>
+            </div>
+            <div class="tui-col_lg-3 tui-col_md-3 hideOnTablet hideOnMobile">
+                <ng-container *ngTemplateOutlet="modulesComponent"></ng-container>
+            </div>
+        </div>
+    </div>
+    
+    <ng-template #modulesComponent>
+        <course-modules 
+            [lang]="lang" 
+            [courseUrl]="content.info.url" 
+            [modules]="getModules()" 
+            [content]="getContent()" 
+            [mode]="content.info.mode" 
+            [openedIndex]="(openedIndex | async) || 0">
+        </course-modules>
+    </ng-template>
+</ng-container>
+
+
+
+<ng-template #contentPortal let-contents="contents">
+    <ng-container *tuiLet="(contentIndex | async) || 0 as index">
+        <tui-scrollbar #scrollbar class="scrollbar">
+            <div class="navWrapper">
+                <button tuiIconButton appearance="mono" size="m" [shape]="'rounded'" class="scroll left" [icon]="'tuiIconChevronLeftLarge'" (click)="scroll('left')" [disabled]="index == 0" tuiHint="Previous content"></button>
+                <tui-tabs [activeItemIndex]="index || 0" (activeItemIndexChange)="contentIndex$.next($event)" class="contentNav">
+                    <a tuiTab 
+                    *ngFor="let content of contents; index as i"
+                    id="tab-{{i}}"
+                    class="contentTab"
+                    [routerLink]="[]" 
+                    routerLinkActive 
+                    [queryParams]="{content: i}"
+                    [class.active]="index == i"
+                    [class.completed]="content.completed"
+                    tuiHintAppearance="onDark"
+                    [tuiHint]="contentTitle"
+                    > <ng-template #contentTitle>{{content.title}}</ng-template> <app-icon>{{content.type | cIcon}}</app-icon>{{content.title}} </a>
+                </tui-tabs>
+                <button tuiIconButton appearance="mono" size="m" [shape]="'rounded'" class="scroll right" [icon]="'tuiIconChevronRightLarge'" (click)="scroll('right')" [disabled]="index == contents.length - 1" tuiHint="Next content"></button>
+            </div>
+        </tui-scrollbar>
+        <div class="contentPortal" *ngIf="contents[index] as block" [ngSwitch]="block.type">
+            <ng-template ngSwitchCase="video">
+                <ng-container *ngTemplateOutlet="video; context: {url: block.files[0].url || block.link}"></ng-container> 
+            </ng-template>
+            <ng-template ngSwitchCase="article">article</ng-template>
+            <ng-template ngSwitchCase="quiz">quiz</ng-template>
+            <ng-template ngSwitchCase="reading_materials">materials</ng-template>
+            <ng-template ngSwitchDefault>{{block.type}}</ng-template>
+        </div>
+    </ng-container>
+</ng-template>
+
+<ng-template #video let-url="url">
+    <video
+        tuiMedia
+        controls
+        class="video"
+    >
+        <source [src]="url" type="video/mp4"/>
+    </video>
+</ng-template>

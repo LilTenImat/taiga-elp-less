@@ -14,6 +14,8 @@ import { CookiePolicyComponent } from './static/cookie-policy.component';
 import { PrivacyPolicyComponent } from './static/privacy-policy.component';
 import { LoginComponent } from './user/auth/login.component';
 import { AuthComponent } from './user/auth/auth.component';
+import { ContentComponent } from './course/content/content.component';
+import { ContentGuard } from './helpers/content.guard';
 
 const routes: Routes = [
   { path: '', redirectTo: '/courses', pathMatch: 'full' },
@@ -50,15 +52,16 @@ const routes: Routes = [
     children: [
       { path: '', redirectTo: '/courses', pathMatch: 'full'},
       { path: 'new', component: CreateCourseComponent, canActivate: [EditorGuard]},
-      { path: ':courseUrl', redirectTo: `en/:courseUrl`, pathMatch: 'full' },
       {
         path: ':language/:courseUrl', 
         children: [
-          { path: '', component: CourseComponent, data: {mode: 'landing'} },
-          { path: 'content/:moduleUrl', component: CourseComponent, data: { mode: 'content' } },
+          { path: '', component: CourseComponent },
+          // { path: 'content', component:  }
+          { path: ':moduleUrl', component: ContentComponent, canActivate: [ContentGuard] },
         ],
         canActivate: [AuthGuarg]
       },
+      { path: ':courseUrl', redirectTo: `en/:courseUrl`, pathMatch: 'full' },
     ],
   },
 

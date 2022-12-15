@@ -1,32 +1,12 @@
-<ng-container *tuiLet="!!(isDarkTheme$ | async) as darkTheme">
-    <tui-theme-night *ngIf="darkTheme"></tui-theme-night>
-    <tui-root > 
-        <!-- <div class="tui-container">
-            <tui-breadcrumbs>
-                <ng-container *ngFor="let item of route$ | async">
-                    <a
-                        *tuiItem
-                        tuiLink
-                        [routerLink]="item.link"
-                        [queryParams]="item.query ? item.query : {}"
-                    >
-                        {{ item.name }}
-                    </a>
-                </ng-container>
-            </tui-breadcrumbs>
-        </div> -->
-        
-
         <ng-container *ngIf="(course$ | async) as course; else courseLandingSkeleton">
             <ng-container [ngSwitch]="(mode$ | async)">
-                <edit-landing *ngSwitchCase="'landing'" [course]="course" (edited)="courseSubject$.next($event)"></edit-landing>
-                <edit-content *ngSwitchCase="'content'" [course]="course" [lang]="(language | async) || en"></edit-content>
-                <app-content *ngSwitchCase="'view'" [course]="course" [lang]="(language | async) || en"></app-content>
-                <course-landing *ngSwitchDefault [course]="course"></course-landing>
+                <edit-landing *ngSwitchCase="'landing'" [course$]="course$" (edited)="onEditedCourse($event)"></edit-landing>
+                <edit-content *ngSwitchCase="'content'" [course$]="course$" [lang]="(language | async) || en"></edit-content>
+                <course-landing *ngSwitchDefault [course$]="course$"></course-landing>
             </ng-container>
         </ng-container>
         
-        <div class="edit">
+        <div class="edit" *ngIf="editor$ | async">
             <button
                 *ngIf="(course$ | async)"
                 tuiButton
@@ -54,9 +34,7 @@
                 </div>
             </button>
         </div>
-        
-    </tui-root>
-</ng-container>
+
 
 <ng-template #courseLandingSkeleton>
     <div style="position: relative;">

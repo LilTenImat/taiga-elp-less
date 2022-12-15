@@ -16,10 +16,10 @@ import { User } from '../user/user';
 })
 
 export class ToobarComponent implements OnInit {
-    menuOpen = false;
-
     user$: Observable<User | null | undefined>;
     lang$: Observable<languages>;
+    admin$: Observable<boolean>;
+    editor$: Observable<boolean>;
 
     menuButtons = [
         {url: "about-us", icon: 'groups'},
@@ -45,15 +45,14 @@ export class ToobarComponent implements OnInit {
             this.nightTheme.patchValue(theme == themes.dark, {emitEvent: false});
         })
         this.user$ = auth.currentUser;
+        this.admin$ = auth.currentUserAdmin;
+        this.editor$ = auth.currentUserEditor;''
         this.lang$ = langService.currentLanguage;
 
         this.nightTheme.valueChanges.subscribe(value => this.themeSevice.setTheme(value ? themes.dark : themes.light));
     }
 
     ngOnInit() {}
-
-    getAdmin = () => this.user$.pipe(map(u => !!u?.admin));
-    getEditor = () => this.user$.pipe(map(u => !!u?.editor));
 
     urlContains(url: string){
         return this.router.routerState.snapshot.url.includes(url);

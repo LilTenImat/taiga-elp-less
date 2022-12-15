@@ -2,12 +2,13 @@ import { HttpEvent, HttpEventType } from '@angular/common/http';
 import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output, ViewChild } from '@angular/core';
 import { AbstractControl, FormArray, FormBuilder, FormControl, FormGroup, UntypedFormControl, Validators } from '@angular/forms';
 import { TuiFileLike } from '@taiga-ui/kit';
-import { catchError, filter, finalize, map, Observable, of, Subject, switchMap } from 'rxjs';
+import { BehaviorSubject, catchError, filter, finalize, map, Observable, of, Subject, switchMap } from 'rxjs';
 import { languages, TUI_EDITOR_TOOLS } from 'src/app/environment';
 import { ButtonToggleComponent } from 'src/app/helpers/button-toggle/button-toggle.component';
 import { FileService } from 'src/app/services/file.service';
 import { Content, IObject, ObjectTypeEnum, emptyContent, _blockLanguages, Quiz, _question } from './content';
 import { ContentService } from './content.service';
+import { CdkDragDrop, moveItemInArray, transferArrayItem } from '@angular/cdk/drag-drop';
 
 @Component({
     selector: 'edit-block',
@@ -29,8 +30,6 @@ export class EditBlockComponent implements OnInit {
     @Input() lang: languages = languages.en;
     @Input() final_test?: boolean; 
     @Input() type: ObjectTypeEnum = ObjectTypeEnum.ARTICLE;
-
-    @Output() contentChange = new EventEmitter<IObject>();
 
     public get editedContent(){
         if(!this.content) return undefined;
@@ -117,6 +116,8 @@ export class EditBlockComponent implements OnInit {
     }
 
     addQuestion() {
+        const controls = this.contentForm.controls.questions;
+
         const questionForm = this.fb.group({
           questionText: this.fb.control('') as FormControl<string>,
           answers: this.fb.array([
@@ -126,24 +127,49 @@ export class EditBlockComponent implements OnInit {
             })
           ])
         });
-        this.contentForm.controls.questions.push(questionForm);
-        this.onQuizActiveZone(true, (this.contentForm.controls.questions.length || 1) - 1);
+        controls.push(questionForm);
+        this.onQuizActiveZone(true, (controls.length || 1) - 1);
+        setTimeout(
+            () => (document.querySelector(`#question-${controls.length - 1}`) as HTMLInputElement )?.focus(),
+            100
+        )
     }
   
     deleteQuestion(qIndex: number) {
         this.contentForm.controls.questions.removeAt(qIndex);
+        if(qIndex != 0) setTimeout(
+            () => (document.querySelector(`#question-${qIndex - 1}`) as HTMLInputElement )?.focus(),
+        100)
     }
 
     addAnswer(qIndex: number){
+        const controls =  this.contentForm.controls.questions.controls[qIndex].controls.answers;
         const answerForm = this.fb.group({
             answerText: this.fb.control('') as FormControl<string>,
             isCorrect: this.fb.control(false) as FormControl<boolean>
         })
-        this.contentForm.controls.questions.controls[qIndex].controls.answers.push(answerForm);
+        controls.push(answerForm);
+        setTimeout(
+            () => (document.querySelector(`#answer-${controls.length - 1}`) as HTMLInputElement )?.focus(),
+            100
+        )
     }
 
     deleteAnswer(qIndex: number, aIndex: number){
-       this.contentForm.controls.questions.controls[qIndex].controls.answers.removeAt(aIndex);
+        this.contentForm.controls.questions.controls[qIndex].controls.answers.removeAt(aIndex);
+        if(aIndex != 0) setTimeout(
+            () => (document.querySelector(`#answer-${aIndex - 1}`) as HTMLInputElement )?.focus(),
+        100)
+    }
+
+    dropQuestion(event: CdkDragDrop<FormGroup[]>){
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
+        if(this.quizActiveZone != null)
+        this.quizActiveZone = event.currentIndex;
+    }
+
+    dropAnswer(event: CdkDragDrop<FormGroup[]>){
+        moveItemInArray(event.container.data, event.previousIndex, event.currentIndex);
     }
 
     uploadFile(file: TuiFileLike): Observable<TuiFileLike | null> {
@@ -158,7 +184,7 @@ export class EditBlockComponent implements OnInit {
                     }
 
                     case HttpEventType.Response: {
-                        console.log(httpEvent.body);
+                        // console.log(httpEvent.body);
 
                         return {
                             name: '',
@@ -196,7 +222,6 @@ export class EditBlockComponent implements OnInit {
         this.rejectedFiles$.next(null);
     }
     onQuizActiveZone(active: boolean, index: number) {
-        this.log(active, index)
         if(!active){
             if(this.quizActiveZone == index) return this.quizActiveZone = null;
             if(this.quizActiveZone == null) this.quizActiveZone = index;
@@ -204,6 +229,18 @@ export class EditBlockComponent implements OnInit {
             this.quizActiveZone = index;
         }
         return null;
+        // this.quizActiveZone = index;
     }
-    log = console.log
+    // log = console.log
+
+
+    answerKey(ev: any, qIndex: number, aIndex: number){
+        if(aIndex != 0)
+        if(!ev.target.value) this.deleteAnswer(qIndex, aIndex);
+    }
+
+    questionKey(ev: any,  qIndex: number){
+        if(qIndex != 0)
+        if(!ev.target.value) this.deleteQuestion(qIndex);
+    }
 }

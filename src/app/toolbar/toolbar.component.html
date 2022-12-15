@@ -2,9 +2,8 @@
 <header class="toolbar">
     <tui-hosted-dropdown
         class="hideOnDesktop"
-        #dropdown
+        #mobileDropdown
         [content]="menuContent"
-        [(open)]="menuOpen"
     >
         <button
             tuiIconButton
@@ -12,17 +11,17 @@
             [size]="'s'"
             type="button"
             class="button"
-            [pseudoHover]="dropdown.open || null"
+            [pseudoHover]="mobileDropdown.open || null"
         ><app-icon>menu</app-icon></button>
     </tui-hosted-dropdown>
 
     <a class="tui-text_h5 logo" routerLink="/">ELPMaster</a>
 
-    <a tuiButton 
+    <a tuiLink
         [ngClass]="{'active': urlContains(b.url)}"
         *ngFor="let b of menuButtons"  
         class="button hideOnMobile hideOnTablet" 
-        size="s" appearance="flat" 
+        appearance="flat" 
         [routerLink]="b.url"
     >{{b.url}}</a>
 
@@ -38,12 +37,21 @@
         ></tui-toggle>
     </label>
 
-    <a tuiButton *ngIf="getAdmin() | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/admin">Admin panel</a>
-    <a tuiButton *ngIf="getEditor() | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/course/new">Create course</a>
+    <a tuiButton *ngIf="admin$ | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/admin">Admin panel</a>
+    <a tuiButton *ngIf="editor$ | async" class="button hideOnMobile" size="s" appearance="primary" routerLink="/course/new">Create course</a>
 
-    <span class="user tui-text_h6 hideOnMobile hideOnTablet user" *ngIf="(user$ | async) as user; else login">
-        {{user.name + ' ' + user.surname}}
-    </span>
+    <tui-hosted-dropdown
+        class="user tui-text_h6 hideOnMobile hideOnTablet user"
+        #userDropdown
+        [content]="userMenuContent"
+        *ngIf="(user$ | async) as user; else login"
+    >
+        <span
+            tuiButton
+            type="button"
+            (focused)="userDropdown.open || null"
+        >{{user.name + ' ' + user.surname}}</span>
+    </tui-hosted-dropdown>
 
     <ng-template #login>
         <a tuiButton class="button" size="s" appearance="outline" routerLink="/login">Login</a>
@@ -93,9 +101,18 @@
                 <app-icon>auto_stories</app-icon>
                 {{ 'my courses' }}
             </a>
+            <a tuiOption *ngIf="admin$ | async" class="hideOnTablet" size="s" routerLink="/admin">
+                <app-icon>manage_accounts</app-icon>
+                Admin panel
+            </a>
+            <a tuiOption *ngIf="editor$ | async" class="hideOnTablet" size="s" routerLink="/course/new">
+                <app-icon>post_add</app-icon>
+                Create course
+            </a>
         </tui-data-list>
     </ng-template>
-
+    
+    
     <ng-template #profileNest>
         <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
             <a tuiOption [size]="'s'" routerLink="/logout">
@@ -105,4 +122,21 @@
         </tui-data-list>
     </ng-template>
 
+</ng-template>
+
+<ng-template #userMenuContent let-activeZone>
+    <tui-data-list tuiDataListDropdownManager [tuiActiveZoneParent]="activeZone">
+        <a tuiOption [size]="'s'"  routerLink="/profile">
+            <app-icon>account_circle</app-icon>
+            {{'profile'}}
+        </a>
+        <a tuiOption [size]="'s'" routerLink="/courses/my">
+            <app-icon>auto_stories</app-icon>
+            {{ 'my courses' }}
+        </a>
+        <a tuiOption [size]="'s'" routerLink="/logout">
+            <app-icon>logout</app-icon>
+            {{ 'logout' }}
+        </a>
+    </tui-data-list>
 </ng-template>

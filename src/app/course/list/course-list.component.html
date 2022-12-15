@@ -1,59 +1,25 @@
-<tui-theme-night *ngIf="isDarkTheme$ | async"></tui-theme-night>
-<tui-root>
-    <h2 class="tui-container tui-container_adaptive"> Our courses 
-        <tui-toggle
-            *ngIf="editor"
-            [formControl]="publishedCourses"
-            [showIcons]="true"
-        ></tui-toggle>
-    </h2>
-    <div class="tui-container tui-container_adaptive">
-        <div class="tui-row tui-row_adaptive tui-row_align_start" *ngIf="(courses$ | async) as courses; else: skeleton;">
-            <div *ngFor="let course of courses; index as i" class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container">
-                <course-card [course]="course" mode="inlist" [@tuiFadeIn]="getAnimation(300)" [editor]="editor"></course-card>
-            </div>
+<h2 class="tui-container tui-container_adaptive"> 
+    Our courses 
+    <tui-toggle
+        *ngIf="editor"
+        [formControl]="publishedCourses"
+        [showIcons]="true"
+        [tuiHint]="'Toggle hidden courses'"
+    ></tui-toggle>
+</h2>
+
+<div class="tui-container tui-container_adaptive">
+    <div class="tui-row tui-row_adaptive centredOnMobile" *ngIf="(courses$ | async) as courses; else: skeleton;">
+        <div *ngFor="let course of courses; index as i" class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container">
+            <course-card [course]="course" mode="inlist" [@tuiFadeIn]="getAnimation(300)" [editor]="editor"></course-card>
         </div>
     </div>
-    
-    <ng-template #skeleton>
-        <div class="tui-row tui-row_adaptive tui-row_align_start">
-            <div class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container" *ngFor="let i of [1, 2, 3]">
-                <course-card mode="inlist" [@tuiFadeIn]="getAnimation(300)"></course-card>
-            </div>
+</div>
+
+<ng-template #skeleton>
+    <div class="tui-row tui-row_adaptive centredOnMobile">
+        <div class="tui-col_lg-4 tui-col_md-6 tui-col_xs-12 list-container" *ngFor="let i of [1, 2, 3]">
+            <course-card mode="inlist" [@tuiFadeIn]="getAnimation(300)"></course-card>
         </div>
-    </ng-template>
-    
-    
-    <!-- <section class="tui-container">
-        <h2 class="title">How you could benefit with us</h2>
-        <p>By offering our courses online we can make education accessible and affordable for everyone.</p>
-        <p>&nbsp;</p>
-        <div class="container wrap">
-            <div *ngFor="let b of benefits" class="benefit">
-                <img [src]="'/assets/images/' + b.icon " style="height: 80px;">
-                <h2>{{b.title}}</h2>
-                <p>{{b.text}}</p>
-            </div>
-        </div>
-    </section>
-    
-    <section class="tui-container">
-        <h2>Partner courses</h2>
-        <div class="container wrap">
-            <tui-island  class="partner" *ngFor="let partner of partners">
-                <img mat-card-image [src]="partner.content.logo">
-                <h3 class="tui-island__title">{{partner.title}}</h3>
-                <p class="tui-island__paragraph">{{partner.content.intro}}</p>
-                <a tuiButton
-                    type="button"
-                    appearance="flat"
-                    size="m"
-                    class="tui-island__footer-button button"
-                    [href]="partner.content.url | safe : 'url'"
-                    >
-                    more
-                </a>
-            </tui-island>
-        </div>
-    </section> -->
-</tui-root>
+    </div>
+</ng-template>

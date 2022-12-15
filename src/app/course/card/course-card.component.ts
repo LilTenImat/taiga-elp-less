@@ -62,7 +62,7 @@ export class CourseCardComponent implements OnInit {
   }
   
   onReject(ev: any){
-    console.log(ev);
+    // console.log(ev);
   }
   ngOnInit() { 
     if(this.mode != 'editing') this.form.disable();

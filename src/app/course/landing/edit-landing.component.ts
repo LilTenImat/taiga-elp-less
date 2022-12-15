@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
-import { BehaviorSubject, map, skip, withLatestFrom } from 'rxjs';
+import { BehaviorSubject, concatMap, lastValueFrom, map, Observable, of, skip, throwError, withLatestFrom } from 'rxjs';
 import { languages, TUI_EDITOR_TOOLS } from 'src/app/environment';
 import { LanguageService } from 'src/app/services/language.service';
 import { Course, emptyCourseLanguage, _languages } from '../course';
@@ -21,12 +21,9 @@ export class EditLandingComponent implements OnInit {
     savingCourse = new BehaviorSubject<boolean>(false);
     savingState$ = this.savingCourse.asObservable();
 
-    courseSource$ = new BehaviorSubject<Course | undefined>(undefined);
-    course$ = this.courseSource$.asObservable();
+    @Input() course$?: Observable<Course | undefined>;
     language$ = new BehaviorSubject<languages>(languages.en);
     lang$ = this.language$.asObservable();
-
-    @Input() set course(val: Course | undefined){this.courseSource$.next(val); }
 
     @Output() edited = new EventEmitter<Course>();
 
@@ -47,7 +44,10 @@ export class EditLandingComponent implements OnInit {
     ) { 
         languageService.currentLanguage.subscribe(lang => this.language$.next(lang));
 
-        this.course$.pipe(withLatestFrom(this.lang$)).subscribe(value => {
+    }
+
+    ngOnInit() {
+        this.course$?.pipe(withLatestFrom(this.lang$)).subscribe(value => {
             if(!value[0]) return this.courseForm.reset(undefined, {emitEvent: false});
             const content = value[0].languages ? value[0].languages[value[1]] : value[0].languages!.en;
             this.courseForm.setValue({
@@ -62,12 +62,8 @@ export class EditLandingComponent implements OnInit {
         })
     }
 
-    ngOnInit() {
-
-    }
-
-    getModules = () => this.course$.pipe(map(course => course?.modules || []));
-    getContent = () => this.course$.pipe(map(course => course?.content || []));
+    getModules = () => this.course$?.pipe(map(course => course?.modules || []));
+    getContent = () => this.course$?.pipe(map(course => course?.content || []));
 
     onValuesFromCard(ev: {image: string, cardInfo: string, duration: number}){
         this.courseForm.patchValue({
@@ -78,24 +74,25 @@ export class EditLandingComponent implements OnInit {
     }
 
     onSaveChanges(){
+        if(!this.course$) return;
+
         this.savingCourse.next(true);
-        const course = this.courseSource$.value;
-        if(!course) return;
-        if(!course.languages) course.languages = {en: emptyCourseLanguage()} as _languages;
 
         const controls = this.courseForm.controls;
-
-        course.languages[this.language$.value] = {
-            description: controls.description.value || '',
-            additional: controls.additional.value || '',
-            title: controls.title.value || '',
-            intro: controls.intro.value || '',
-            cardInfo: controls.cardInfo.value || '',
-        }
-        course.duration = controls.duration.value || '';
-        course.image = controls.image.value || '';
-
-        this.courseService.putCourse(course).subscribe(res => {
+        this.course$.pipe(concatMap(course => course ? this.courseService.putCourse({
+            courseId: course.courseId,
+            languages: {
+                [this.language$.value]: {
+                    description: controls.description.value || '',
+                    additional: controls.additional.value || '',
+                    title: controls.title.value || '',
+                    intro: controls.intro.value || '',
+                    cardInfo: controls.cardInfo.value || '',
+                }
+            },
+            duration: controls.duration.value || '',
+            image: controls.image.value || ''
+        } as Course) : throwError(() => 'No course!') )).subscribe(res => {
             this.edited.emit(res);
         }, err => {}, () => {
             this.courseForm.reset();

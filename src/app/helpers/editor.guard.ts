@@ -12,6 +12,6 @@ export class EditorGuard implements CanActivate {
     ) { }
 
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot): Observable<boolean> {
-      return this.authService.currentUser.pipe(map(user => !!(user?.editor || user?.admin)));  
+      return this.authService.currentUserEditor  
     }
 }

@@ -37,9 +37,11 @@ export interface Course {
     url?: string,
     image?: string,
     published: boolean,
-  
     mode: 'sequential' | 'free',
     duration: string,
+    courseId: string,
+    price: number,
+  
     certificateTemplate: string,
     quizThreshold?: number,
   
@@ -47,13 +49,11 @@ export interface Course {
   
     actions: XapiStatement[],
   
-    price: number,
-    courseId: string,
     pubicationDate?: string,
     courseLanguages?: string[],
     modules?: Module[],
     content?: IObject[],
-    joined?: string,
+    joined?: number,
     isJoined?: boolean,
     createdBy: string,
     createdAt: string,

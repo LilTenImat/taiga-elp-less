@@ -19,9 +19,11 @@ import {
     TuiFieldErrorPipeModule,
     TuiInputPasswordModule,
     TuiActionModule,
+    TuiTilesModule,
+    TuiCheckboxModule,
+    TuiCheckboxLabeledModule,
+    TuiTabsModule
 } from '@taiga-ui/kit';
-
-// import {TuiTilesModule} from '@taiga-ui/kit';
 
 import { 
     TuiHintModule,
@@ -38,14 +40,18 @@ import {
     TuiGroupModule,
     TuiExpandModule,
     TuiErrorModule,
-    TuiPrimitiveTextfieldModule
+    TuiPrimitiveTextfieldModule,
+    TuiScrollbarModule
 } from '@taiga-ui/core';
 
 import { 
     TuiActiveZoneModule,
     TuiLetModule,
     TuiPortalModule,
-    TuiForModule
+    TuiForModule,
+    TuiDestroyService,
+    TuiPanModule,
+    TuiMediaModule
 } from '@taiga-ui/cdk';
 
 import { TuiSidebarModule } from '@taiga-ui/addon-mobile';
@@ -95,7 +101,14 @@ import { TuiReorderModule } from '@taiga-ui/addon-table';
         TuiInputPasswordModule,
         TuiActionModule,
         TuiPrimitiveTextfieldModule,
-        TuiTilesModule
-    ]
+        TuiTilesModule,
+        TuiCheckboxModule,
+        TuiCheckboxLabeledModule,
+        TuiTabsModule,
+        TuiScrollbarModule,
+        TuiPanModule,
+        TuiMediaModule
+    ],
+    providers: [TuiDestroyService]
 })
 export class TaigaModule { }

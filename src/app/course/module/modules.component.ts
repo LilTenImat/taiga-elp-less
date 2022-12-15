@@ -36,6 +36,7 @@ export class ModulesComponent implements OnInit {
     }
     @Input() lang: languages = languages.en;
     @Input() editing: boolean = false;
+    @Input() openedIndex: number = -1;
 
     @Output() loading = new EventEmitter<boolean>();
     
@@ -121,12 +122,7 @@ export class ModulesComponent implements OnInit {
     onModuleClose(id?: string){
         if(!id) return;
         const arr = this.openedModules.value; 
-        arr.forEach((mId: string, index: number) => {
-            if(mId == id){
-                arr.splice(index, 1);
-                return this.openedModules.next(arr);
-            }
-        })
+        this.openedModules.next(arr.splice(arr.indexOf(id), 1));
 
         this.editingModuleId.next('');
         this.moduleTitleForm.setValue('');

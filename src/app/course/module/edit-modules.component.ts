@@ -1,9 +1,10 @@
 import { ChangeDetectionStrategy, Component, Input, OnInit, ViewChild } from '@angular/core';
-import { BehaviorSubject, concatMap, map, Observable, Subject } from 'rxjs';
+import { BehaviorSubject, concatMap, lastValueFrom, map, Observable, Subject } from 'rxjs';
 import { languages, TUI_EDITOR_TOOLS } from 'src/app/environment';
 import { emptyContent, IObject, ObjectTypeEnum, _blockLanguages } from '../content/content';
 import { ContentService } from '../content/content.service';
 import { Course } from '../course';
+import { CourseService } from '../course.service';
 import { Module } from './module';
 import { ModuleService } from './module.service';
 import { ModulesComponent } from './modules.component';
@@ -27,41 +28,43 @@ export class EditContentComponent implements OnInit {
     loadingBlock = new BehaviorSubject(false);
     loadingBlock$ = this.loadingBlock.asObservable();
 
-    courseSource$ = new BehaviorSubject<Course | undefined>(undefined);
-    course$ = this.courseSource$.asObservable();
+    @Input() course$?: Observable<Course | undefined>;
     language$ = new BehaviorSubject<languages>(languages.en);
     lang$ = this.language$.asObservable();
 
-    @Input() set course(val: Course | undefined){this.courseSource$.next(val); }
     @Input() set lang(val: languages | null){this.language$.next(val ? val : languages.en)};
 
-    constructor(private moduleService: ModuleService, private contentService: ContentService) { }
+    constructor(
+        private moduleService: ModuleService, 
+        private contentService: ContentService,
+        private courseService: CourseService
+        ) { }
     ngOnInit() { }
 
-    getModules = () => this.course$.pipe(map(course => course?.modules || []));
-    getContent = () => this.course$.pipe(map(course => course?.content || []));
-    getMode = () => this.course$.pipe(map(course => course?.mode));
+    getModules = () => this.course$?.pipe(map(course => course?.modules || []));
+    getContent = () => this.course$?.pipe(map(course => course?.content || []));
+    getMode = () => this.course$?.pipe(map(course => course?.mode));
 
-    onAddModule(){
-        const course = this.courseSource$.value;
+    async onAddModule(){
+        if(!this.course$) return;
+        const course = await lastValueFrom(this.course$);
         if(!course) return;
-
         this.loadingBlock.next(true);
+        
         this.moduleService.postModule({
             title: 'New module',
             courseId: course.courseId,
-            order: this.courseSource$.value?.content?.length || 1,
+            order: course.content?.length || 1,
             languages: {en: {title: 'New module'}}
         } as Module).subscribe(res => {
-            if(!course.modules) course.modules = [];
-            course.modules.push(res);
-            this.courseSource$.next(course);
+            this.courseService.refreshCourse(res.courseId);
             if(this.modulesComponent) this.modulesComponent.editModule(res.moduleId);
         }, err=>{}, () => { this.loadingBlock.next(false); });
     }
 
-    onAddBlock(type: ObjectTypeEnum = ObjectTypeEnum.ARTICLE){
-        const course = this.courseSource$.value;
+    async onAddBlock(type: ObjectTypeEnum = ObjectTypeEnum.ARTICLE){
+        if(!this.course$) return;
+        const course = await lastValueFrom(this.course$);
         if(!course) return;
 
         this.loadingBlock.next(true);
@@ -81,9 +84,7 @@ export class EditContentComponent implements OnInit {
             order: course.content ? course.content.filter(x => x.moduleId == mId).length : 0,
         } as IObject
         ).subscribe(res => {
-            if(!course.content) course.content = [];
-            course.content.push(res);
-            this.courseSource$.next(course);
+            this.courseService.refreshCourse(res.courseId);
 
             if(this.modulesComponent) this.modulesComponent.editBlock(res.moduleId, res.objectId);
         }, err => {}, () => {this.loadingBlock.next(false);})

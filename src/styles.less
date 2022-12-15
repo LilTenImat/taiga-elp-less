@@ -25,12 +25,16 @@ body{
     display: none !important;
 
     @media @tui-tablet{
-        display: initial !important;
+        display: inherit !important;
     }
 }
 .hideOnTablet{
+    
     @media @tui-tablet{
         display: none !important;
+    }
+    @media @tui-mobile{
+        display: inherit !important;
     }
 }
 .hideOnMobile{
@@ -38,6 +42,13 @@ body{
         display: none !important;
     }
 }
+
+.centredOnMobile{
+    @media @tui-mobile{
+        justify-content: center;
+    }
+}
+
 .socket{
     white-space: pre-wrap;
 }
@@ -75,7 +86,7 @@ body{
     }
 
     @media @tui-mobile{
-        top: 64px;
+        top: 128px;
     }
 }
 
@@ -86,3 +97,4 @@ body{
 .layout{
     min-height: calc(100vh - 4rem);
 }
+

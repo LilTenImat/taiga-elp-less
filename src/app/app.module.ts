@@ -47,6 +47,7 @@ import {
 import { ButtonToggleComponent } from "./helpers/button-toggle/button-toggle.component";
 import { LoginComponent } from "./user/auth/login.component";
 import { AuthComponent } from "./user/auth/auth.component";
+import { TuiDestroyService } from "@taiga-ui/cdk";
 
 @NgModule({
   declarations: [
@@ -89,7 +90,6 @@ import { AuthComponent } from "./user/auth/auth.component";
     TaigaModule,
     DragDropModule,
     StaticPagesModule,
-    
 ],
   providers: [
     {provide: TUI_SANITIZER, useClass: NgDompurifySanitizer},

@@ -31,9 +31,7 @@ interface _info{
 
 export class LandingComponent implements OnInit {
     en = languages.en;
-    @Input() set course(val: Course | undefined){this.courseSource$.next(val);};
-    courseSource$ = new BehaviorSubject<Course | undefined>(undefined);
-    course$ = this.courseSource$.asObservable();
+    @Input() course$?: Observable<Course | undefined>;
 
     language: Observable<languages>;
 
@@ -45,10 +43,10 @@ export class LandingComponent implements OnInit {
 
     ngOnInit() {}
 
-    getModules = () => this.course$.pipe(map(course => course?.modules || []));
-    getContent = () => this.course$.pipe(map(course => course?.content || []));
+    getModules = () => this.course$?.pipe(map(course => course?.modules || []));
+    getContent = () => this.course$?.pipe(map(course => course?.content || []));
     
-    getInfo = () => this.course$.pipe(withLatestFrom(this.language), map(value => {
+    getInfo = () => this.course$?.pipe(withLatestFrom(this.language), map(value => {
             const course = value[0], lang = value[1];
             if(!course) return undefined;
             const content: _language = course.languages ? course.languages[lang] : course.languages!.en;
@@ -72,4 +70,8 @@ export class LandingComponent implements OnInit {
         }
     ))
     
+    joined$ = this.course$?.pipe(map(course => {
+        if(!course) return false;
+        return !!course?.actions.find(a => a.verb.type == 'join');
+    }))
 }

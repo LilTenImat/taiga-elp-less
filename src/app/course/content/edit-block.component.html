@@ -4,7 +4,8 @@
     </p>
     <form [formGroup]="contentForm" class="editForm" *tuiLet="this.contentForm.controls as contControls">
         <tui-input
-            tuiTextfieldExampleText="Block title here..."
+            class="titleInput"
+            tuiTextfieldExampleText="Block title..."
             formControlName="title"
         >
             Title
@@ -21,7 +22,7 @@
                 [state]="!!contControls.files.value?.length ? 'file' : (!!contControls.link.value ? 'link' : null)"
                 >
             </button-toggle-group>
-            <br>
+            
             <ng-container *ngIf="toggle.state == 'file'">
                 <tui-input-files
                     [maxFileSize]="200000000"
@@ -56,7 +57,7 @@
                     *ngIf="toggle.state == 'link'"
                     tuiTextfieldExampleText="http://example.com/"
                     formControlName="link"
-                    tuiAutoFocus
+                    
                     >
                     Link
                 </tui-input>
@@ -72,7 +73,7 @@
                 [state]="'text'"
                 >
                 </button-toggle-group>
-                <br>
+                
                 <ng-container *ngIf="toggle.state == 'file'">
                     <tui-input-files
                         *ngIf="!quizFileControl.value"
@@ -97,102 +98,120 @@
                     </tui-files>
                 </ng-container>
                 <ng-container *ngIf="toggle.state == 'text'">
-                    <div 
-                        class="questions active-zone" 
-                        cdkDropList
+                    <form class="questions" 
                         [cdkDropListData]="contControls.questions.controls"
-                        >
-                        <!-- {{questions.isFocused}} -->
+                        cdkDropList
+                        (cdkDropListDropped)="dropQuestion($event)"
+                        #parent="tuiActiveZone"
+                        (tuiActiveZoneChange)="{}"
+                        formArrayName="questions"
+                        (ngSubmit)="addQuestion()"
+                    >
                         <div
+                            #question="tuiActiveZone"
+                            [tuiActiveZoneParent]="parent"
+                            (tuiActiveZoneChange)="onQuizActiveZone($event, i)"
+                            [class.active-zone_active]="quizActiveZone == i"
                             cdkDrag
                             *ngFor="let questionForm of contControls.questions.controls; index as i"
-                            [class.active-zone_active]="quizActiveZone == i"
-                            class="quiestion"
+                            [formGroup]="questionForm"
+                            class="quiestion active-zone"
                             id="{{i}}"
                         >
-                        
-                            <div class="quiestionText" 
-                                #parent="tuiActiveZone"
-                                (tuiActiveZoneChange)="onQuizActiveZone($event, i)"
-                            >
-                                <div class="qPlaceholder" *cdkDragPlaceholder></div>
-                                <tui-input
-                                tuiTextfieldSize="l"
-                                [formControl]="questionForm.controls.questionText"
-                                [tuiTextfieldIcon]="removeQuestion"
-                                [tuiTextfieldIconLeft]="handle"
-                            >
-                                Question text here
-                                <span class="tui-required"></span>
-                                <input
-                                    tuiTextfield
-                                />
-                                </tui-input>
+                            <div>
+                                <div class="quiestionText">
+                                    <div class="qPlaceholder" *cdkDragPlaceholder></div>
+                                    <tui-input
+                                        tuiTextfieldSize="l"
+                                        formControlName="questionText"
+                                        [tuiTextfieldIcon]="i != 0 ? removeQuestion : undefined"
+                                        [tuiTextfieldIconLeft]="handle"
+                                    >
+                                        Question text
+                                        <span class="tui-required"></span>
+                                        <input (keydown.backspace)="questionKey($event, i)" id="question-{{i}}" tuiTextfield >
+                                    </tui-input>
 
-                                <ng-template #removeQuestion>
-                                    <tui-svg
-                                        [tuiHint]="'Remove question'"
-                                        [src]="'tuiIconCloseLarge'"
-                                        (click)="deleteQuestion(i)"
-                                        class="icon"
-                                    ></tui-svg>
-                                </ng-template>
+                                    <ng-template #removeQuestion>
+                                        <tui-svg
+                                            [tuiHint]="'Remove question'"
+                                            [src]="'tuiIconCloseLarge'"
+                                            (click)="deleteQuestion(i)"
+                                            class="icon"
+                                        ></tui-svg>
+                                    </ng-template>
 
-                                <ng-template #handle>
-                                    <tui-svg  [src]="'tuiIconDragLarge'" tuiHint="Drag me!" class="icon" cdkDragHandle></tui-svg>
-                                </ng-template>
-                            </div>
-                        
-                            <br >
-
-                            <tui-expand  
-                                class="answers" 
-                                [expanded]="quizActiveZone == i" 
-                                cdkDropList 
-                                [cdkDropListData]="questionForm.controls.answers.controls"
-                                #child="tuiActiveZone"
-                                [tuiActiveZoneParent]="parent"
-                            >
-                                <ng-template tuiExpandContent>
-                                    <div  class="answerText" *ngFor="let answerForm of questionForm.controls.answers.controls; index as j" cdkDrag>
-                                        <div class="qPlaceholder" *cdkDragPlaceholder></div>
-                                        <tui-input
-                                            tuiTextfieldSize="m"
-                                            [formControl]="answerForm.controls.answerText"
-                                            [tuiTextfieldIcon]="removeAnswer"
-                                            [tuiTextfieldIconLeft]="handleAns"
-                                            class="answer"
+                                    
+                                    <ng-template #handle>
+                                        <tui-svg [src]="'tuiIconDragLarge'" tuiHint="Drag me!" class="icon" cdkDragHandle></tui-svg>
+                                    </ng-template>
+                                </div>
+                                <tui-expand  
+                                    #expand
+                                    class="answers" 
+                                    [expanded]="quizActiveZone == i" 
+                                    cdkDropList 
+                                    [cdkDropListData]="questionForm.controls.answers.controls"
+                                    (cdkDropListDropped)="dropAnswer($event)"
+                                    [tuiActiveZoneParent]="parent"
+                                    
+                                >
+                                    <ng-template tuiExpandContent>
+                                    <form 
+                                        formArrayName="answers"
+                                        (ngSubmit)="addAnswer(i)"
+                                    >
+                                        <div  
+                                            cdkDrag
+                                            class="answerText" 
+                                            *ngFor="let answerForm of questionForm.controls.answers.controls; index as j"
+                                            [formGroup]="answerForm"
                                         >
-                                            Answer text here
-                                            <span class="tui-required"></span>
-                                            <input
-                                                tuiTextfield
-                                            />
-                                        </tui-input>
-
-                                        <ng-template #removeAnswer>
-                                            <tui-svg
-                                                [tuiHint]="'Remove answer'"
-                                                [src]="'tuiIconCloseLarge'"
-                                                (click)="deleteAnswer(i, j)"
-                                                class="icon"
-                                            ></tui-svg>
-                                        </ng-template>
-                                        <ng-template #handleAns>
-                                            <tui-svg [src]="'tuiIconDrag'" (mousedown.prevent.stop)="{}" tuiHint="Drag me!" class="icon" cdkDragHandle (click)="log('fuck')"></tui-svg>
-                                        </ng-template>
-                                    </div>
-        
-        
-                                    <button tuiIconButton (click)="addAnswer(i)" [appearance]="'flat'" [tuiHint]="'Add answer'"  [size]="'s'" class="addAns" [icon]="'tuiIconPlus'"></button>
-                                </ng-template>
-                            </tui-expand>
+                                            <div class="qPlaceholder"  *cdkDragPlaceholder></div>
+                                        
+                                            <tui-checkbox-labeled class="answer" formControlName="isCorrect">
+                                                <tui-input
+                                                    tuiTextfieldSize="m"
+                                                    formControlName="answerText"
+                                                    [tuiTextfieldIcon]="j != 0 ? removeQuestion : undefined"
+                                                    [tuiTextfieldIconLeft]="handleAns"
+                                                    class="answer"
+                                                >
+                                                    Answer text
+                                                    <span class="tui-required"></span>
+                                                    <input (keydown.backspace)="answerKey($event, i, j)" tuiTextfield id="answer-{{j}}">
     
+                                                    <ng-template #handleAns>
+                                                        <tui-svg [src]="'tuiIconDrag'" tuiHint="Drag me!" class="icon" cdkDragHandle></tui-svg>
+                                                    </ng-template>
+    
+                                                    <ng-template #removeAnswer>
+                                                        <tui-svg
+                                                            [tuiHint]="'Remove answer'"
+                                                            [src]="'tuiIconCloseLarge'"
+                                                            (click)="deleteAnswer(i, j)"
+                                                            class="icon"
+                                                        ></tui-svg>
+                                                    </ng-template>
+                                                </tui-input>
+                                            </tui-checkbox-labeled>
+
+                                        </div>
+            
+                                        <div class="addAns">
+                                            <button tuiButton type="submit" [appearance]="'flat'" [size]="'s'"  [icon]="'tuiIconPlus'">Add answer</button>
+                                        </div>
+                                        <!-- (click)="addAnswer(i)" -->
+                                    </form>
+                                    </ng-template>
+                                </tui-expand>
+                            </div>
                             
                         </div>
-
-                        <button tuiIconButton (click)="addQuestion();" [appearance]="'flat'" [tuiHint]="'Add quiestion'"  [size]="'s'" class="addQue" [icon]="'tuiIconPlus'"></button>
-                    </div>
+                        <div class="addQue">
+                            <button type="submit" tuiButton [appearance]="'flat'"  [size]="'s'"  [icon]="'tuiIconPlus'">Add quiestion</button>
+                        </div>
+                    </form>
                 </ng-container>
 
             </ng-container>
@@ -207,12 +226,12 @@
                 [state]="!!contControls.text.value ? 'text' : (!!contControls.link.value ? 'link' : null)"
                 >
                 </button-toggle-group>
-                <br>
+                
                 <tui-editor
                     *ngIf="toggle.state == 'text'"
                     class="editor"
                     formControlName="text"
-                    tuiAutoFocus
+                    
                     [tools]="editorTools">
                 </tui-editor>
 
@@ -220,7 +239,7 @@
                     *ngIf="toggle.state == 'link'"
                     tuiTextfieldExampleText="http://example.com/"
                     formControlName="link"
-                    tuiAutoFocus
+                    
                     >
                     Link
                 </tui-input>

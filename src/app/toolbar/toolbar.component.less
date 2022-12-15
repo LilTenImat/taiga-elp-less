@@ -17,6 +17,7 @@
 
 .user{
     white-space: nowrap;
+    cursor: pointer;
 }
 
 .under{
@@ -33,14 +34,13 @@
     flex: 1 1 auto;
 }
 
-.button{
-    color: var(--tui-text-01);
-}
-
 a[tuiOption]{
     justify-content: flex-start;
 }
 
-.active{
-    border: 1px solid var(--tui-neutral-fill);
+.button{
+    padding: 0.2rem;
+    &.active{
+        border-bottom: 1px solid var(--tui-link);
+    }
 }

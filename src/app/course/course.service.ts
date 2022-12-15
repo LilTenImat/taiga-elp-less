@@ -4,7 +4,7 @@ import { ApiService } from '../services/api.service';
 import { Course } from './course';
 import { AuthService } from '../services/auth.service';
 import { ENDPOINTS } from '../config';
-import { BehaviorSubject, concatMap, filter, map, OperatorFunction, Subject, tap, throwError } from 'rxjs';
+import { BehaviorSubject, concatMap, filter, map, of, OperatorFunction, Subject, tap, throwError } from 'rxjs';
 
 @Injectable({providedIn: 'root'})
 export class CourseService extends ApiService {
@@ -37,14 +37,16 @@ export class CourseService extends ApiService {
       if(!courseId && !course) return;
       if(course && course.courseId != courseId) this.currentCourse$.next(null);
 
-
       this.http.get<Course>(`${ENDPOINTS.course}/${courseId || course?.courseId}`, {
         headers: {'Content-Type': 'application/json', Authorization: 'Bearer ' + this.auth.getToken()},
       }).subscribe(res => this.currentCourse$.next(res));
     }
 
-    getCourse = (courseId: string) => {
-      this.refreshCourse(courseId);
+    getCourse = (courseId: string, options?: {update: boolean}) => {
+      const course = this.currentCourse$.value;
+      if(!course ||options?.update || (course && course.courseId != courseId && course.url != courseId) )
+        this.refreshCourse(courseId);
+      
       return this.currentCourse$.asObservable().pipe(filter(course => course != null) as OperatorFunction<Course | null, Course>);
     }
 
@@ -59,15 +61,12 @@ export class CourseService extends ApiService {
       });
     }
 
-    putCourse = (course: Course) => {
-      const data = this._prepareBody(course);
-      return this.makeRequest<Course>({
-        method: 'put',
-        endpoint: `${ENDPOINTS.course}/${course.courseId}`,
-        body: data,
-        authorization: true,
-      });
-    }
+    putCourse = (course: Course) => this.makeRequest<Course>({
+      method: 'put',
+      endpoint: `${ENDPOINTS.course}/${course.courseId}`,
+      body: course,
+      authorization: true,
+    });
 
     deleteCourse = (courseId: string) =>
       this.makeRequest<Course>({

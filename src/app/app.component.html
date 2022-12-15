@@ -1,8 +1,11 @@
-<toolbar></toolbar>
-<div class="layout">
-    <router-outlet></router-outlet>
-</div>
-<footer></footer>
-
-
-
+<ng-container *tuiLet="!!(isDarkTheme$ | async) as darkTheme">
+    <tui-theme-night *ngIf="darkTheme"></tui-theme-night>
+    <tui-root>
+        <toolbar></toolbar>
+        <div class="layout">
+            <router-outlet></router-outlet>
+        </div>
+        <footer></footer>
+    </tui-root>
+</ng-container>
+<tui-root>

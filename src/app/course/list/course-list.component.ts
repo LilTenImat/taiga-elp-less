@@ -8,6 +8,8 @@ import {TuiDurationOptions, tuiFadeInList, tuiFadeIn} from '@taiga-ui/core';
 import {animate, query, stagger, state, style, transition, trigger} from '@angular/animations';
 import { AuthService } from 'src/app/services/auth.service';
 import { FormControl } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Location } from '@angular/common';
 
 // const TRANSITION = `{{duration}}ms {{delay}}ms ease-in-out`;
 // const DURATION = {params: {duration: 300}};
@@ -17,7 +19,7 @@ import { FormControl } from '@angular/forms';
     templateUrl: 'course-list.component.html',
     styleUrls: ['../course.component.less'],
     changeDetection: ChangeDetectionStrategy.OnPush,
-    animations: [tuiFadeIn, tuiFadeInList]
+    animations: [tuiFadeIn, tuiFadeInList],
 })
 
 export class CourseListComponent implements OnInit {
@@ -71,12 +73,12 @@ export class CourseListComponent implements OnInit {
     
     editor: boolean = false;
     publishedCourses = new FormControl<boolean>(true);
-
-    isDarkTheme$ = this.themeService.isDarkTheme$;
     constructor(
         private courseService: CourseService,
-        private themeService: ThemeService,
-        private auth: AuthService
+        private auth: AuthService,
+        private router: Router,
+        private route: ActivatedRoute,
+        private location: Location
     ) {
         this.auth.currentUserEditor.pipe(
             tap(isEditor =>  {this.publishedCourses.setValue(isEditor, {emitEvent: false}); this.editor = isEditor;}),

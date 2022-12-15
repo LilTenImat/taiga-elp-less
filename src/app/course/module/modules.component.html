@@ -2,7 +2,7 @@
     <!-- Intro -->
     <div *ngIf="mds[0] as introduction" class="intro">
         <div *ngIf="introduction.blocks | async as blocks">
-            <ng-container *ngTemplateOutlet="blockList; context: {blocks: blocks, url: introduction.module.url, moduleId: introduction.module.moduleId}"></ng-container>
+            <ng-container *ngTemplateOutlet="blockList; context: {blocks: blocks, moduleUrl: introduction.module.url, moduleId: introduction.module.moduleId}"></ng-container>
         </div>
     </div>
 
@@ -22,7 +22,7 @@
                 *ngFor="let module of modules; index as i;" 
                 [disabled]="disabled || (mEditingId == module.module.moduleId)" 
                 cdkDrag
-                [open]="mEditingId == module.module.moduleId"
+                [open]="(mEditingId == module.module.moduleId) || !!(openedIds | async)?.includes(module.module.moduleId) || openedIndex == module.module.order"
                 [cdkDragDisabled]="disabled || !editing || (mEditingId == module.module.moduleId)"
                 (openChange)="$event ? onModuleOpen(module.module.moduleId) : onModuleClose(module.module.moduleId)"
                 [showArrow]="false"
@@ -100,14 +100,14 @@
                 </ng-template>
     
                 <ng-template tuiAccordionItemContent *ngIf="getSortedModuleContent(module.module.moduleId) | async as blocks">
-                    <ng-container *ngTemplateOutlet="blockList; context: {blocks: (module.blocks | async), url: module.module.url, moduleId: module.module.moduleId}"></ng-container>
+                    <ng-container *ngTemplateOutlet="blockList; context: {blocks: (module.blocks | async), moduleUrl: module.module.url, moduleId: module.module.moduleId}"></ng-container>
                 </ng-template>
             </tui-accordion-item>
         </tui-accordion>
     </ng-container>
 
     <!-- Block list template -->
-    <ng-template #blockList let-blocks="blocks" let-url="url" let-moduleId="moduleId">
+    <ng-template #blockList let-blocks="blocks" let-moduleUrl="moduleUrl" let-moduleId="moduleId">
         <div         
             cdkDropList
             [id]="moduleId"
@@ -142,10 +142,9 @@
                         [content]="blockTitle"
                         [lineHeight]="24"
                         [linesLimit]="1"
-                        
                     >
                         <ng-template #blockTitle>
-                            <a *ngIf="!editing && !disabled; else disabledTitle" class="blockTitle" routerLink="/course/{{lang}}/{{courseUrl ? courseUrl : block.courseId}}/content/{{url}}" [queryParams]="{content: block.order}">{{(block.content.languages ? block.content.languages[lang].title : block.title) || 'New ' + block.type}}</a>
+                            <a *ngIf="!editing && !disabled; else disabledTitle" class="blockTitle" routerLink="/course/{{lang}}/{{courseUrl ? courseUrl : block.courseId}}/{{moduleUrl}}" [queryParams]="{content: j}">{{(block.content.languages ? block.content.languages[lang].title : block.title) || 'New ' + block.type}}</a>
                         </ng-template>
                     </tui-line-clamp>
     
